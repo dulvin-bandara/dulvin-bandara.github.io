@@ -235,10 +235,19 @@ li{margin-bottom:5px;}
     <div class="rowlabel">Project 01</div>
     <div>
       <div class="entry">
-        <h2>Accumulator Cooling CFD — M25 & M26</h2>
+        <h2>Accumulator Cooling CFD - Ducting Design</h2>
         <p class="meta">Monash Motorsport · Senior Aerodynamics Engineer, Head of Cooling subsection · 2026</p>
 
-        <p>The M26 accumulator is a 120s1p, 6.38 kWh air-cooled pack. Cooling exists to let the pack run a full endurance duty cycle at a smaller capacity: simulation showed a 4.8 kWh pack could match the endurance performance of a heavier uncooled pack, worth roughly 9.4 kg of cell mass.</p>
+        <p>The M26 accumulator is a 120s1p, 6.38 kWh air-cooled pack. Cooling exists to let the pack run a full endurance duty cycle at a smaller capacity. Following PACSIM simulations
+          a 4.8 kWh pack was able to match the endurance performance of a heavier uncooled pack, which correlates to 9,4kg of cell mass. With mass being a high-sensitivity parameter in the points model,
+          the cooled system is able to provide a significant advantage in the overall car performance.
+        </p>
+
+        <p>
+          With airflow towards the accumulator needing to pulled from somewhere, through initial runs the ducting competes for air volume
+          with the side diffuser & undertray. In the first iteration the aerodynamic cost was
+
+        </p>
 
         <p>My role was building and running the CFD that validates the packaged design against the team's thermal targets — segment-level and whole-accumulator models, mass flow boundary conditions across the duct air gaps, and comparison of the resulting pressure drop against hand-calculated predictions.</p>
 
@@ -263,7 +272,7 @@ li{margin-bottom:5px;}
     <div class="rowlabel">Project 02</div>
     <div>
       <div class="entry">
-        <h2>Production CFD pipeline — pyfluent on HPC</h2>
+        <h2>Production CFD pipeline - PyFluent on HPC</h2>
         <p class="meta">Monash Motorsport · Ansys Fluent 25R1, M3 MASSIVE cluster, SLURM · 2026</p>
 
         <p>[Describe the pipeline in 2–3 sentences: what it automates, why it exists, what it replaced. Mention scripted case setup, batch submission, and post-processing.]</p>
