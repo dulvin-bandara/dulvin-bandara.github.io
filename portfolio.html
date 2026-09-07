@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio — Dulvin Bandara</title>
+<meta name="description" content="Project writeups: accumulator cooling ducting and CFD, production PyFluent pipeline, wind tunnel testing, rear wing design.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="sitenav">
+  <a href="index.html">Overview</a>
+  <a href="portfolio.html" aria-current="page">Portfolio</a>
+</nav>
+
+<div class="sheet">
+
+<header class="masthead">
+  <h1>Portfolio</h1>
+  <p class="role">Project writeups — aerodynamics, cooling and CFD workflow development
+    at Monash Motorsport.</p>
+  <div class="contact">
+    <span>Dulvin Bandara</span>
+    <span>dulvinb@gmail.com</span>
+    <span><a href="https://www.linkedin.com/in/dulvin-bandara-8b485725a/" target="_blank" rel="noopener">LinkedIn</a></span>
+  </div>
+</header>
+
+<!-- ================= PROJECT 01 ================= -->
+<section id="accumulator-cooling">
+  <div class="row">
+    <div class="rowlabel">Project 01</div>
+    <div>
+      <div class="entry">
+        <h2>Accumulator cooling — ducting design and CFD</h2>
+        <p class="meta">Monash Motorsport · Senior Aerodynamics Engineer, Head of Cooling subsection · Ansys Fluent 25R1, PyFluent, M3 MASSIVE HPC · 2026</p>
+
+        <p>The M26 accumulator is a 120s1p, 6.38&nbsp;kWh air-cooled pack. Cooling exists
+          so the pack can run a full endurance duty cycle at reduced capacity. PACSIM
+          simulations showed a 4.8&nbsp;kWh pack matching the endurance performance of a
+          heavier uncooled pack, corresponding to 9.4&nbsp;kg of cell mass. With mass a
+          high-sensitivity parameter in the points model, the cooled system is a
+          significant net gain in car performance.</p>
+
+        <p>The catch is that airflow has to be drawn from somewhere on the car, and the
+          ducting competes for volume with the side diffuser and undertray. The first
+          cooling configuration made that cost visible: side diffuser CLA fell from 1.369
+          to 0.963 and undertray from 0.980 to 0.686 against a sealed-duct reference. The
+          enclosed duct was choking the underfloor rather than simply adding drag.</p>
+
+        <h3>Reworking the ducting</h3>
+
+        <p>I replaced the enclosed duct with a more open arrangement, using turning vanes
+          to guide air into the cooling circuit rather than forcing it through a
+          constricted passage. Across the design iteration the cooling package went from
+          4.406 to 5.174 CLA — around 17% — with aero balance landing on 50.0% and CDA
+          slightly down. Guiding air in via vanes rather than forcing it through a duct
+          also reduces water ingress into the accumulator, without the external hardware
+          a mesh screen would have required.</p>
+
+        <div class="figures">
+          <div class="fig"><span class="val">+0.768</span><span class="cap">CLA, initial to final cooling configuration</span></div>
+          <div class="fig"><span class="val">+0.367</span><span class="cap">Side diffuser CLA recovered</span></div>
+          <div class="fig"><span class="val">+0.189</span><span class="cap">Undertray CLA recovered</span></div>
+          <div class="fig"><span class="val">50.0%</span><span class="cap">Aero balance, final configuration</span></div>
+        </div>
+
+        <p>Side diffuser and undertray account for roughly 72% of that recovery, which is
+          where an enclosed duct would be expected to hurt. Remaining configuration
+          differences — rad fan operation and the inverter shelf — mean the gain is
+          attributable to the design iteration as a whole rather than to the vanes in
+          isolation.</p>
+
+        <!-- FIGURE: component CLA comparison chart
+        <figure class="plate">
+          <img src="images/component-cla.png"
+               alt="Grouped bar chart of component CLA across three cooling configurations">
+          <figcaption>Component CLA across sealed, initial cooling and final
+            configurations. Recovery concentrates in the side diffuser and undertray.</figcaption>
+        </figure>
+        -->
+
+        <h3>Flow through the monocoque</h3>
+
+        <p>A separate result came from comparing the sealed-duct reference against the
+          flowing configuration on otherwise identical geometry. Monocoque CLA moved from
+          −0.269 sealed to −0.028 with air passing through it, a gain of 0.241 on that
+          component alone.</p>
+
+        <p>Sealed, the duct inlet is a stagnation region — air arrives at a dead end and
+          spills into the surrounding flow field, loading the monocoque unfavourably.
+          Opening the circuit lets that flow be swallowed and routed instead of pushed
+          out. It is a useful counter to the assumption that cooling ducts are purely an
+          aero cost: on this car the flow path pays back part of what it takes.</p>
+
+        <h3>Internal cooling design</h3>
+
+        <p>Inter-cell duct width was selected by intersecting system pressure-drop curves
+          with the fan curve across candidate air gaps. Narrower gaps raise thermal
+          performance but push the operating point past what the fan can deliver; the
+          5&nbsp;mm gap sits where the fan curve and system curve cross at a usable mass
+          flow. Segment-level and whole-accumulator models validated the packaged design
+          against the team's thermal targets, with CFD pressure drop tracking
+          hand-calculated predictions to within 20%.</p>
+
+        <div class="figures">
+          <div class="fig"><span class="val">&lt;20%</span><span class="cap">CFD vs hand-calc pressure drop agreement</span></div>
+          <div class="fig"><span class="val">5 mm</span><span class="cap">Selected inter-cell air gap</span></div>
+          <div class="fig"><span class="val">2.81 K/W</span><span class="cap">Cell surface to air, at operating point</span></div>
+          <div class="fig"><span class="val">0.197 W/K</span><span class="cap">Total pack cooling, against 0.2 target</span></div>
+        </div>
+
+        <h3>Simulation setup</h3>
+
+        <p>Half-car model with symmetry, ground effect and rotating wheels, 35.5M cells in
+          the final configuration. Three internal fan circuits — radiator, rear brake heat
+          and accumulator internal — are represented by pressure-jump boundary conditions
+          rather than resolved blade geometry. I derived those polynomials from
+          manufacturer fan curves and confirmed stable operating points by hand before
+          committing HPC time, then brought the fans up through a staged α-ramp, scaling
+          all polynomial coefficients together so the equilibrium root is preserved while
+          the surrounding field develops. [Turbulence model — add here.]</p>
+
+        <p class="scope">Scope: the thermal resistance modelling and cooling-method trade
+          study (cell body vs tab vs PCM) were produced by teammates in the electrical
+          powertrain group, and the mesh independence study by a peer. My contribution was
+          the duct design, the CFD setup and boundary conditions, and the meshing and
+          solver debugging.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROJECT 02 ================= -->
+<section id="cfd-pipeline">
+  <div class="row">
+    <div class="rowlabel">Project 02</div>
+    <div>
+      <div class="entry">
+        <h2>Production CFD pipeline — PyFluent on HPC</h2>
+        <p class="meta">Monash Motorsport · Ansys Fluent 25R1, PyFluent, SLURM, M3 MASSIVE cluster · 2026</p>
+
+        <p>[Describe the pipeline in 2–3 sentences: what it automates, why it exists, and
+          what it replaced. The migration from journal files to version-controlled
+          PyFluent, scripted case setup, batch submission through SLURM, and automated
+          post-processing.]</p>
+
+        <p>Integrating cooling into this pipeline required deriving fan boundary
+          conditions as a pressure-jump polynomial from the manufacturer fan curve, so fan
+          discs could be represented without resolving blade geometry.</p>
+
+        <div class="figures">
+          <div class="fig"><span class="val">238</span><span class="cap">Cases per campaign</span></div>
+          <div class="fig"><span class="val">35.5M</span><span class="cap">Mesh cell count, typical case</span></div>
+          <div class="fig"><span class="val">54%</span><span class="cap">Runtime reduction</span></div>
+        </div>
+
+        <h3>Getting it to mesh</h3>
+
+        <p>The pipeline repeatedly failed at volume meshing: tetrahedral initialisation
+          died across all partitions, followed by a segmentation fault — an unhelpful
+          failure mode, since the crash is well downstream of the cause.</p>
+
+        <p>Working back through the transcript, the intersection warnings clustered at
+          y&nbsp;=&nbsp;0.000000 exactly, inside the radiator fan region. The cause was
+          topological rather than dimensional: the fan and superwall geometry and the main
+          car had been wrapped independently, producing two different triangulations
+          occupying the same plane at symmetry with no shared nodes. A tet mesher cannot
+          initialise through non-conformal coincident surfaces.</p>
+
+        <p>Matching the wrap resolutions would not have fixed this, and refining them
+          would have produced more intersection events, not fewer. The fix was to make the
+          interface conformal — joining the coincident face zones and merging duplicate
+          nodes — keeping the duct sealed at the centreline rather than trading the problem
+          for a leak path or a band of sliver cells.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROJECT 03 ================= -->
+<section id="wind-tunnel">
+  <div class="row">
+    <div class="rowlabel">Project 03</div>
+    <div>
+      <div class="entry">
+        <h2>Wind tunnel testing — ACSA</h2>
+        <p class="meta">[Context] · [Dates]</p>
+        <p>[What was tested, your role in it, and what the CFD-to-tunnel correlation
+          showed. State the configurations run, what was instrumented, and where CFD and
+          tunnel agreed or diverged — divergence you can explain is more convincing than
+          agreement you can't.]</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROJECT 04 ================= -->
+<section id="rear-wing">
+  <div class="row">
+    <div class="rowlabel">Project 04</div>
+    <div>
+      <div class="entry">
+        <h2>Rear wing — FSAE-A</h2>
+        <p class="meta">Monash Motorsport · [Year]</p>
+        <p>[The design brief and constraints, your contribution, and how the ClA 3.14
+          figure translated to the 10.27-point dynamic event gain. Note co-design scope
+          explicitly.]</p>
+        <div class="figures">
+          <div class="fig"><span class="val">3.14</span><span class="cap">ClA</span></div>
+          <div class="fig"><span class="val">10.27</span><span class="cap">Dynamic event points gained</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TOOLS ================= -->
+<section>
+  <div class="row">
+    <div class="rowlabel">Tools</div>
+    <div>
+      <div class="skillgroup">
+        <h3>CFD and simulation</h3>
+        <p>Ansys Fluent 25R1 · PyFluent scripting · SLURM / HPC batch workflows · mesh generation and convergence · boundary condition derivation · MATLAB post-processing</p>
+      </div>
+      <div class="skillgroup">
+        <h3>Thermal</h3>
+        <p>Conjugate heat transfer setup · duct and internal flow · fan curve and system curve matching · CFD-to-rig-test validation</p>
+      </div>
+      <div class="skillgroup">
+        <h3>Design and CAD</h3>
+        <p>Siemens NX · duct and packaging geometry · cooling system integration into vehicle architecture</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
