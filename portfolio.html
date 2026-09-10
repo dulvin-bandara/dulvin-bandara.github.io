@@ -163,6 +163,10 @@
           developing an automated integrated cooling CFD workflow, to quantify any cooling decisions and conduct design iterations.
         </p>
 
+        <h3>
+          Prelim Investigations
+        </h3>
+
         <p>
           Since the fan boundary condition was an unknown region being explored for the first time, understanding the basics on how Fluent handles it 
           was vital. Through testing via various isolated block fan models, to define a fan boundary condition applied onto a face there had to be cells 
@@ -172,6 +176,10 @@
           cells out of it, stopping as it hits the previously wrapped surface. The issue this creates is, as it hits a solid such as a fan cylinder it won’t 
           define any volume cells behind the fan face and thus unable to define the fan boundary condition.
         </p>
+
+        <h3> 
+          Fan Definition Fixes
+        </h3>
 
         <p>
           The first fix for this is to model the fan face as an infinitely thin circle, in theory this seemed perfect, with something being infinitely thin this 
@@ -208,6 +216,10 @@
           and the overall impact to the car flow cooling design runs had. 
         </p>
 
+        <h3>
+          Workflow Migration to PyFluent
+        </h3>
+
         <p>
           Towards the middle of this year, the team began a migration of the existing TUI workflow to an improved PyFluent workflow. What positives did this provide? The 
           PyFluent workflow was hosted via GitHub allowing for greater single version-controlled files allowing to safely save, review and merge any code changes. Furthermore, 
@@ -223,6 +235,10 @@
           I personally had faced when making code changes and noticing late on into a run losing all that progress. A total of 22 unit tests were created with all running in 
           around 0.22 seconds saving key moments of time late on into a run. Over 2026 a total of 238 cases were completed and 35.5M cells over a full car case.
         </p>
+
+        <h3>
+          Post-Processing and Visualisation
+        </h3>
 
         <p>
           At the end of the day all of this work is useless if we aren’t able to both visualise and quantify impacts from design runs; post-processing the data gained from these 
@@ -244,6 +260,10 @@
           compare duct performance at a smaller scale rather than the full car which the ParaView sweeps provided.
         </p>
 
+        <h3>
+          Fan Curve Derivation and Staging
+        </h3>
+
         <p>
           Previously mentioned we looked at defining the fan boundary condition but did not go into detail about how that was applied. In Fluent the fan boundary condition zone is defined 
           through the use of a fan curve. A fan curve is static pressure vs the airflow volume which identifies the relationship between how much air the fan is able to push out at varying 
@@ -254,6 +274,10 @@
           Unfortunately during testing, it was noted when the fans were given to its full operating point the solution began to immediately diverge, over some testing though it was found 
           staging the fans over the course of the run was able to prevent the divergence faced in previous runs without impacting the continuity of the run.
         </p>
+        
+        <h3>
+          Summary of Project
+        </h3>
 
         <p>
           Overall the pipeline was able to be completed successfully and with the architecture now built in PyFluent and on GitHub it is easy to use for any upcoming design runs, along with 
@@ -265,25 +289,6 @@
           <div class="fig"><span class="val">35.5M</span><span class="cap">Mesh cell count, typical case</span></div>
           <div class="fig"><span class="val">54%</span><span class="cap">Runtime reduction</span></div>
         </div>
-
-        <h3>Getting it to mesh</h3>
-
-        <p>The pipeline repeatedly failed at volume meshing: tetrahedral initialisation
-          died across all partitions, followed by a segmentation fault — an unhelpful
-          failure mode, since the crash is well downstream of the cause.</p>
-
-        <p>Working back through the transcript, the intersection warnings clustered at
-          y&nbsp;=&nbsp;0.000000 exactly, inside the radiator fan region. The cause was
-          topological rather than dimensional: the fan and superwall geometry and the main
-          car had been wrapped independently, producing two different triangulations
-          occupying the same plane at symmetry with no shared nodes. A tet mesher cannot
-          initialise through non-conformal coincident surfaces.</p>
-
-        <p>Matching the wrap resolutions would not have fixed this, and refining them
-          would have produced more intersection events, not fewer. The fix was to make the
-          interface conformal — joining the coincident face zones and merging duplicate
-          nodes — keeping the duct sealed at the centreline rather than trading the problem
-          for a leak path or a band of sliver cells.</p>
       </div>
     </div>
   </div>
