@@ -163,9 +163,102 @@
           developing an automated integrated cooling CFD workflow, to quantify any cooling decisions and conduct design iterations.
         </p>
 
-        <p>Integrating cooling into this pipeline required deriving fan boundary
-          conditions as a pressure-jump polynomial from the manufacturer fan curve, so fan
-          discs could be represented without resolving blade geometry.</p>
+        <p>
+          Since the fan boundary condition was an unknown region being explored for the first time, understanding the basics on how Fluent handles it 
+          was vital. Through testing via various isolated block fan models, to define a fan boundary condition applied onto a face there had to be cells 
+          modelled in front and behind that face. While in theory this seems fairly simple, in practice proved to be a challenge. Our current pipeline 
+          once the geometry was imported in to complete the surface mesh a “wrap” is conducted placing an infinite large blanket over the geometry at a 
+          set drapability index to define the edges of the geometry. A set material point which is an arbitrary point somewhere in the domain grows volume 
+          cells out of it, stopping as it hits the previously wrapped surface. The issue this creates is, as it hits a solid such as a fan cylinder it won’t 
+          define any volume cells behind the fan face and thus unable to define the fan boundary condition.
+        </p>
+
+        <p>
+          The first fix for this is to model the fan face as an infinitely thin circle, in theory this seemed perfect, with something being infinitely thin this 
+          should allow cells to propagate in front of and behind the fan face thus allowing the fan boundary condition to be placed onto it. Theory was right 
+          it did but the same positive that allowed this solution to be explored was unfortunately its downfall as well. By making the surface infinitely 
+          thin the cells were defined in front and behind the surface but also caused those cells to overlap and intersect each other. Tetrahedral initialization 
+          failed followed by segmentation failure, it was an obvious topological CAD error and not worth exploring more. 
+        </p>
+
+        <p>
+          The second fix looked at modelling the fan as a 3D solid with the obvious choice being a cylinder. For convention sake the face facing the front of 
+          the car is the fan face, with the rearward face defined as the fan outlet. Following this new geometry the proposed fix was to utilise material points. 
+          How? As mentioned prior a material point grows volume cells out of the specified location stopping once hitting a wall specified by the wrap. Following this 
+          logic, if volume cells are emanating out from an arbitrary point until it hits the fan cylinder exterior wall, defining an extra material point inside the fan 
+          cylinder should develop the cells required inside the fan to define the fan boundary condition. Therefore the process was getting the coordinate in the centre 
+          of the fan cylinder, either allowing Fluent to convert the coordinates via the applied vehicle attitudes, and then defining the material points. Through initial 
+          trials, the material points for some fans were defining whereas some were not, investigating this between coordinates that Fluent recorded after the attitude 
+          definitions and the coordinates Fluent should be recording via hand calcs with the deviations summarised in Table 1. In some fans we can note some significant 
+          deviations in the coordinates, which is hypothesised to be a reason why the material points weren’t conducting the required duty. Following this fixes were tested 
+          primarily involving making the mesh finer around the specified region and increasing the drapeability of the wrap, however to no avail. Unfortunately this fix did 
+          not end up working.
+        </p>
+
+        <p>
+          Fix 3 took things a step back and looked at the problem more simply, instead of taking the current CFD architecture as given and adding to it, I looked at ways 
+          to adjust the architecture to my means. What did that mean? The thought was instead of using 1 wrap over the geometry, but to use 2 wraps! The first wrap included 
+          all geometry as normal, with the second wrap including all geometry except for the fans. The first wrap defined the edges of the fan cylinder defining the exterior 
+          and ensuring the fan geometry is noted, with the second wrap setting up the interior of the fans were taken note of. Once the volume mesh grows out the interior 
+          of the fan is defined too and provides a fix to the issue faced!
+        </p>
+
+        <p>
+          From this fix, the fan boundary conditions were able to be defined as required allowing the solving sequence to proceed and quantifiable look at mass flow values, 
+          and the overall impact to the car flow cooling design runs had. 
+        </p>
+
+        <p>
+          Towards the middle of this year, the team began a migration of the existing TUI workflow to an improved PyFluent workflow. What positives did this provide? The 
+          PyFluent workflow was hosted via GitHub allowing for greater single version-controlled files allowing to safely save, review and merge any code changes. Furthermore, 
+          PyFluent allowed for individual CAD imports with individually defined scoped sizing and BOI’s where previously a group import was done and general scoped sizing’s 
+          and BOI’s were defined. PyFluent also posed no significant impact to the SLURM files with the minor addition of a virtual environment (VENV) requirement to host the 
+          required PyFluent modules.
+        </p>
+
+        <p>
+          My role posed implementing the current proven working TUI workflow into the PyFluent workflow being built. This proved to be fairly simple and useful allowing to 
+          optimise the mesh further in specific regions such as the finer region of the accumulator and not over-optimising unrequired regions. Once everything merged I was 
+          able to note a 54% reduction in runtime, heavily benefiting the efficiency of design runs. A key addition I added in, was unit tests specifically tailored to the errors 
+          I personally had faced when making code changes and noticing late on into a run losing all that progress. A total of 22 unit tests were created with all running in 
+          around 0.22 seconds saving key moments of time late on into a run. Over 2026 a total of 238 cases were completed and 35.5M cells over a full car case.
+        </p>
+
+        <p>
+          At the end of the day all of this work is useless if we aren’t able to both visualise and quantify impacts from design runs; post-processing the data gained from these 
+          simulations are key. The current pipeline contained a working model of Paraview able to generate video contour sweeps for CpT, and other important parameters. 
+          What is that? CpT is the coefficient of total pressure which basically acts as a measure of the energy in the air acting as the sum of the dynamic and static pressure 
+          which more simply are the kinetic and potential energies of the air respectively; CpT in particular allows to manipulate the flow, with high CpT extremely useful for 
+          guiding duct flow and generating downforce. The script was manipulated to produce sweeps including the hollow monocoque and ducting system key for the design runs. 
+        </p>
+
+        <p>
+          Further, there were key sections of interest that I was keen in getting a closer view on, in particular the entrance zone to the monocoque and the entrance to the accumulator. 
+          In my eyes these 2 particular sections dictated the overall cooling of the monocoque, the monocoque inlet flow was directly related to the geometry of the external duct 
+          and impacted the flow entering into the accumulator as setting a limit on what can be entered in. The accumulator inlet worked similarly in being the final stop of what 
+          the air would look like before beginning to cool the cells. In essence what I aimed to do was maximise the monocoque inlet flow as much as possible and limit any losses 
+          between the monocoque inlet and accumulator inlet, trying to keep the contours the same. To develop these contours I first defined planes via attitude changed CAD coordinates 
+          in Fluent, which exported key parameters into .csv’s, these csv’s then pass through a MATLAB file which filters the data organise the data in coordinate order, and then apply 
+          them onto a colored contour map with a preset colour map, allowing us to view parameter. The key parameters I looked at were velocity, & CpT. These planes were also used to 
+          calculate other key parameters such as mass flow and uniformity explained in project 1. This MATLAB script proved to be extremely vital in design runs allowing to directly 
+          compare duct performance at a smaller scale rather than the full car which the ParaView sweeps provided.
+        </p>
+
+        <p>
+          Previously mentioned we looked at defining the fan boundary condition but did not go into detail about how that was applied. In Fluent the fan boundary condition zone is defined 
+          through the use of a fan curve. A fan curve is static pressure vs the airflow volume which identifies the relationship between how much air the fan is able to push out at varying 
+          levels of resistance, generally as the resistance faced increases the airflow the fan is able to push decreases. These fan curves were derived in a means summarised in the pdf below.
+        </p>
+
+        <p>
+          Unfortunately during testing, it was noted when the fans were given to its full operating point the solution began to immediately diverge, over some testing though it was found 
+          staging the fans over the course of the run was able to prevent the divergence faced in previous runs without impacting the continuity of the run.
+        </p>
+
+        <p>
+          Overall the pipeline was able to be completed successfully and with the architecture now built in PyFluent and on GitHub it is easy to use for any upcoming design runs, along with 
+          unit tests to test any changes before being merged into the main branch.
+        </p>
 
         <div class="figures">
           <div class="fig"><span class="val">238</span><span class="cap">Cases per campaign</span></div>
