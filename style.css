@@ -179,6 +179,15 @@ li{margin-bottom:5px;}
   max-width:66ch;
 }
 
+.columnthird {
+  flex: 33.33%;
+  padding: 5px;
+}
+
+.rowthird {
+  display: flex;
+}
+
 /* ---------- scope note (attribution honesty) ---------- */
 
 .scope{
