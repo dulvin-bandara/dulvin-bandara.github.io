@@ -254,6 +254,53 @@
           not end up working.
         </p>
 
+        <table class="dtable">
+          <caption>Table 1 — Deviation between Fluent-recorded and hand-calculated material point coordinates [UNITS]</caption>
+          <thead>
+            <tr><th scope="col"></th><th scope="col">x</th><th scope="col">y</th><th scope="col">z</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Rad fan</th>
+              <td class="m1">0.269</td>
+              <td class="m0">0.000</td>
+              <td class="m1">−0.147</td>
+            </tr>
+            <tr>
+              <th scope="row">Akku fan 1</th>
+              <td class="m3">−2.236</td>
+              <td class="m0">0.100</td>
+              <td class="m1">−0.236</td>
+            </tr>
+            <tr>
+              <th scope="row">Akku fan 2</th>
+              <td class="m3">−2.036</td>
+              <td class="m0">0.000</td>
+              <td class="m1">−0.336</td>
+            </tr>
+            <tr>
+              <th scope="row">Akku fan 3</th>
+              <td class="m3">−2.136</td>
+              <td class="m0">0.000</td>
+              <td class="m1">−0.336</td>
+            </tr>
+            <tr>
+              <th scope="row">RBH fan</th>
+              <td class="m4">−9.918</td>
+              <td class="m1">−0.300</td>
+              <td class="m0">0.075</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <p class="dlegend">
+          <span><span class="sw m0"></span>&lt;0.1</span>
+          <span><span class="sw m1"></span>0.1–0.5</span>
+          <span><span class="sw m2"></span>0.5–2</span>
+          <span><span class="sw m3"></span>2–5</span>
+          <span><span class="sw m4"></span>&gt;5</span>
+        </p>
+
         <p>
           Fix 3 took things a step back and looked at the problem more simply, instead of taking the current CFD architecture as given and adding to it, I looked at ways 
           to adjust the architecture to my means. What did that mean? The thought was instead of using 1 wrap over the geometry, but to use 2 wraps! The first wrap included 
