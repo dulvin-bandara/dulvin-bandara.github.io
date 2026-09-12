@@ -273,26 +273,26 @@
 
         <p>
           Simple in theory, difficult in practice. Once geometry is imported, our pipeline completes
-          the surface mesh through a &ldquo;wrap&rdquo; &mdash; an arbitrarily large blanket laid over the geometry at a
+          the surface mesh through a &ldquo;wrap&rdquo;, an arbitrarily large blanket laid over the geometry at a
           set drapeability index to define its edges. A material point placed somewhere in the domain
           then grows volume cells outwards, stopping when it reaches the wrapped surface. The problem
           this creates is that when growth reaches a solid such as a fan cylinder, no volume cells are
           defined behind the fan face, so the boundary condition cannot be applied.
         </p>
 
-        <h3>Fix 1 &mdash; the infinitely thin face</h3>
+        <h3>Fix 1: The Infinitely Thin Face</h3>
 
         <p>
           The first attempt modelled the fan face as an infinitely thin circle. In theory this is
           exactly right: with no thickness, cells should propagate both in front of and behind the
-          face, allowing the boundary condition to be placed on it. The theory held &mdash; cells were
-          defined on both sides &mdash; but the same property that made it work was its downfall. The cells
+          face, allowing the boundary condition to be placed on it. The theory held as cells were
+          defined on both sides; but the same property that made it work was its downfall. The cells
           in front and behind overlapped and intersected one another. Tetrahedral initialisation
           failed, followed by a segmentation fault. A topological error, and not worth pursuing
           further.
         </p>
 
-        <h3>Fix 2 &mdash; material points inside the fan</h3>
+        <h3>Fix 2: Material Points Inside the Fan</h3>
 
         <p>
           The second attempt modelled the fan as a 3D solid, the obvious choice being a cylinder. By
@@ -307,14 +307,14 @@
         <p>
           In initial trials some fans defined correctly and others did not. Comparing the coordinates
           Fluent recorded after the attitude definitions against hand-calculated values gave the
-          deviations in Table 1, and several fans show significant discrepancies &mdash; the hypothesised
+          deviations in Table 1, and several fans show significant discrepancies; the hypothesised
           reason the material points were not performing their function. Refining the mesh around the
           region and increasing the drapeability of the wrap were both tested, to no avail. This fix
           did not work.
         </p>
 
         <table class="dtable">
-          <caption>Table 1 &mdash; Deviation between Fluent-recorded and hand-calculated material point coordinates [UNITS]</caption>
+          <caption>Table 1: Deviation between Fluent-recorded and hand-calculated material point coordinates [UNITS]</caption>
           <thead>
             <tr><th scope="col"></th><th scope="col">x</th><th scope="col">y</th><th scope="col">z</th></tr>
           </thead>
@@ -335,7 +335,14 @@
           <span><span class="sw m4"></span>&gt;5</span>
         </p>
 
-        <h3>Fix 3 &mdash; two wraps</h3>
+        <p>
+          From these deviations the most troubled section was the RBH fan an almost 10mm deviation in the x-direction. 
+          This error was incredibly difficult to diagnose, with the solution to leave it and find a different fix. While this wasn't
+          the ideal path to follow due to the rigorous time constraint set to solve this issue, it was the only option to move forward with the project. 
+          The next fix was to step back and look at the problem from a different perspective.
+        </p>
+
+        <h3>Fix 3: Two Wraps</h3>
 
         <p>
           The third attempt stepped back from the problem. Rather than taking the CFD architecture as
@@ -352,14 +359,15 @@
           quantifiable for the first time.
         </p>
 
-        <h3>Applying the fan curve</h3>
+        <h3>Applying the Fan Curve</h3>
 
         <p>
-          In Fluent the fan boundary condition is defined through a fan curve &mdash; static pressure
+          In Fluent the fan boundary condition is defined through a fan curve defined as static pressure
           against volumetric airflow, describing how much air the fan can move at varying levels of
-          resistance. As resistance rises, deliverable airflow falls. [One or two sentences on how the
-          curves were derived, or link the PDF.]
+          resistance. As resistance rises, deliverable airflow falls.
         </p>
+
+        <iframe src="fancurve.pdf" width="100%" height="600px" style="border: none;"></iframe>
 
         <p>
           During testing, setting the fans to their full operating point immediately diverged the
@@ -380,7 +388,7 @@
 
         <p>
           My role was implementing the proven TUI cooling workflow into the PyFluent workflow being
-          built. This allowed further mesh optimisation in specific regions &mdash; refining the
+          built. This allowed further mesh optimisation in specific regions, refining the
           accumulator while not over-refining regions that did not need it. Once merged, runtime fell
           by 54%.
         </p>
@@ -403,7 +411,7 @@
         <p>
           All of this is useless without being able to visualise and quantify the impact of a design
           run. The existing pipeline included a working ParaView model generating video contour sweeps
-          for CpT and other parameters. CpT is the coefficient of total pressure &mdash; a measure of the
+          for CpT and other parameters. CpT is the coefficient of total pressure which is a measure of the
           energy in the air, the sum of dynamic and static pressure, or the kinetic and potential
           energies respectively. It is what you manipulate to guide duct flow and generate downforce.
           I adapted the script to produce sweeps including the hollowed monocoque and the ducting
