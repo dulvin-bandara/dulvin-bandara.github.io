@@ -254,6 +254,27 @@
         <h2>Building Cooling into the CFD workflow</h2>
         <p class="meta">Monash Motorsport &middot; Ansys Fluent 25R1, PyFluent, SLURM, M3 MASSIVE cluster &middot; 2026</p>
 
+        <div class="gallery" data-interval="5000">
+          <div class="gstage">
+            <figure class="gslide">
+              <img src="images/gallery/Project2/temperaturesweep.png" alt="Temperature Slice through the Accumulator, showing the temperature distribution">
+              <figcaption>Temperature Slice through the Accumulator, showing the temperature distribution.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project2/cptinlethole.png" alt="CpT of the inlet hole into the monocoque, showing the flow distribution">
+              <figcaption>CpT of the inlet hole into the monocoque, showing the flow distribution.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project2/postproduct.png" alt="Post-Pro of the internal ducting">
+              <figcaption>Post-Pro of the internal ducting.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project2/velocitysweep.png" alt="Velocity Sweep through the Accumulator">
+              <figcaption>Velocity Sweep through the Accumulator.</figcaption>
+            </figure>
+          </div>
+        </div>
+
         <h3>What didn&rsquo;t exist</h3>
 
         <p>
@@ -293,6 +314,12 @@
           failed, followed by a segmentation fault. A topological error, and not worth pursuing
           further.
         </p>
+
+        <figure class="plate">
+          <img src="images/infinitethinfan.png"
+               alt="Infinitely thin fan face, with overlapping cells in front and behind">
+          <figcaption>Infinitely thin fan face.</figcaption>
+        </figure>
 
         <h3>Fix 2: Material Points Inside the Fan</h3>
 
@@ -377,6 +404,12 @@
           affecting the continuity of the solution.
         </p>
 
+        <figure class="plate">
+          <img src="images/fluentcontour.png"
+               alt="Fluent contour of the accumulator cooling ducting, showing the fan boundary condition">
+          <figcaption>Fluent contour of the accumulator cooling ducting.</figcaption>
+        </figure>
+
         <h3>Migrating to PyFluent</h3>
 
         <p>
@@ -398,13 +431,19 @@
         <p>
           I also added unit tests, tailored to the errors I had personally hit when making code
           changes and only discovering the problem late into a run, losing all progress. 22 tests run
-          in around 0.22 seconds and catch those failures before a case is submitted.
+          in around 0.40 seconds and catch those failures before a case is submitted.
         </p>
+
+        <figure class="plate">
+          <img src="images/unittests.png"
+               alt="Unit tests for the PyFluent workflow">
+          <figcaption>Unit tests for the PyFluent workflow.</figcaption>
+        </figure>
 
         <div class="figures">
           <div class="fig"><span class="val">238</span><span class="cap">Cases across the 2026 campaign</span></div>
           <div class="fig"><span class="val">54%</span><span class="cap">Reduction in meshing and solve time</span></div>
-          <div class="fig"><span class="val">22</span><span class="cap">Unit tests, 0.22 s to run</span></div>
+          <div class="fig"><span class="val">22</span><span class="cap">Unit tests, 0.40 s to run</span></div>
           <div class="fig"><span class="val">35.5M</span><span class="cap">Cells, typical full-car case</span></div>
         </div>
 
