@@ -6,7 +6,7 @@
    ============================================================ */
 
 (function () {
-  var figures = document.querySelectorAll('.plate img');
+  var figures = document.querySelectorAll('.plate img, .gslide img');
   if (!figures.length || !window.HTMLDialogElement) return;
 
   // build the dialog once
