@@ -229,7 +229,6 @@ li{margin-bottom:6px;}
   width:100%;
   height:auto;
   border:1px solid var(--rule);
-  background:#fff;
   cursor:zoom-in;
 }
 .plate img:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
@@ -277,7 +276,6 @@ li{margin-bottom:6px;}
   position:relative;
   width:100%;
   aspect-ratio:16/9;
-  background:#fff;
   border:1px solid var(--rule);
   overflow:hidden;
 }
@@ -297,7 +295,6 @@ li{margin-bottom:6px;}
   height:100%;
   object-fit:contain;
   display:block;
-  background:#fff;
   cursor:zoom-in;
   padding:10px;
 }
