@@ -29,11 +29,11 @@ body{
 /* ---------- site nav ---------- */
 
 .sitenav{
-  max-width:1100px;
+  max-width:830px;
   margin:0 auto;
   padding:22px 40px 0;
   display:flex;
-  gap:22px;
+  gap:26px;
   font-size:13.5px;
   letter-spacing:0.01em;
 }
@@ -42,9 +42,20 @@ body{
   text-decoration:none;
   padding-bottom:2px;
   border-bottom:1px solid transparent;
+  display:inline-flex;
+  align-items:baseline;
+  gap:6px;
 }
 .sitenav a:hover{color:var(--ink);border-bottom-color:var(--rule);}
 .sitenav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink);}
+ 
+.sitenav .num{
+  font-size:10.5px;
+  font-weight:600;
+  color:var(--accent);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0.04em;
+}
 
 /* ---------- masthead ---------- */
 
@@ -274,7 +285,10 @@ li{margin-bottom:5px;}
 /* ---------- landing page project links ---------- */
 
 .projlink{
-  display:block;
+  display:grid;
+  grid-template-columns:132px 1fr;
+  gap:20px;
+  align-items:start;
   text-decoration:none;
   color:inherit;
   border-top:1px solid var(--rule);
@@ -282,8 +296,31 @@ li{margin-bottom:5px;}
 }
 .projlink:first-of-type{border-top:none;}
 .projlink:hover h3{color:var(--accent);}
+ 
+.projlink .thumb{
+  width:132px;
+  aspect-ratio:4/3;
+  object-fit:cover;
+  border:1px solid var(--rule);
+  background:#fff;
+  display:block;
+}
+ 
+.projlink .num{
+  font-size:10.5px;
+  font-weight:600;
+  color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0.04em;
+  display:block;
+  margin-bottom:3px;
+}
+ 
 .projlink h3{margin-bottom:3px;transition:color .12s ease;}
-.projlink p{font-size:14px;color:var(--ink-soft);margin:0;}
+.projlink p{font-size:14px;color:var(--ink-soft);margin:0;max-width:60ch;}
+
+/* cards with no image yet — keeps the grid tidy */
+.projlink.noimg{grid-template-columns:1fr;}
 
 /* ---------- skills ---------- */
 
@@ -306,6 +343,8 @@ li{margin-bottom:5px;}
   section{padding:14pt 0 2pt;break-inside:auto;}
   .entry{break-inside:avoid;margin-bottom:16pt;}
   .row{gap:20pt;grid-template-columns:105pt 1fr;}
+  .projlink .thumb{display:none;}
+  .projlink{grid-template-columns:1fr;}
   h2{font-size:13pt;}
   h3{font-size:11pt;}
   .fig .val{font-size:14pt;color:#000;}
@@ -314,6 +353,7 @@ li{margin-bottom:5px;}
   .plate img{max-height:95mm;width:auto;max-width:100%;}
   .plate figcaption{font-size:8.5pt;margin-top:4pt;}
   a{color:inherit;text-decoration:none;}
+  
 }
 
 @media (max-width:640px){
@@ -322,4 +362,7 @@ li{margin-bottom:5px;}
   .row{grid-template-columns:1fr;gap:10px;}
   .rowlabel{padding-top:0;}
   .masthead h1{font-size:30px;}
+  .projlink{grid-template-columns:96px 1fr;gap:14px;}
+  .projlink .thumb{width:96px;}
+  .sitenav{padding:18px 22px 0;gap:18px;}
 }
