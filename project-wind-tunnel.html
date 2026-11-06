@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Australian Centre for Sports Aerodynamics: CFD Validation — Dulvin Bandara</title>
+<meta name="description" content="A week at the Australian Centre for Sports Aerodynamics correlating Monash Motorsport CFD against tunnel data on two cars. Lift discrepancy cut from 23% to roughly 10%.">
+
+<script>
+(function(){try{var s=localStorage.getItem('theme');
+document.documentElement.setAttribute('data-theme',
+s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+}catch(e){}})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="canonical" href="https://dulvinbandara.com/project-wind-tunnel.html">
+<meta name="author" content="Dulvin Bandara">
+<meta name="theme-color" content="#FAF9F6">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dulvin Bandara">
+<meta property="og:url" content="https://dulvinbandara.com/project-wind-tunnel.html">
+<meta property="og:title" content="Australian Centre for Sports Aerodynamics: CFD Validation">
+<meta property="og:description" content="Correlating CFD against tunnel data on two cars, and what changed in the model as a result.">
+<meta property="og:image" content="https://dulvinbandara.com/images/gallery/Project3/day1setup.png">
+<meta property="og:image:alt" content="Day one setup in the wind tunnel with the 2025 car and false floor">
+<meta property="og:locale" content="en_AU">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Australian Centre for Sports Aerodynamics: CFD Validation">
+<meta name="twitter:description" content="CFD-to-tunnel correlation on two Monash Motorsport cars.">
+<meta name="twitter:image" content="https://dulvinbandara.com/images/gallery/Project3/day1setup.png">
+</head>
+<body>
+
+<nav class="sitenav">
+  <a href="index.html"><span class="num">01</span>Index</a>
+  <a href="projects.html" aria-current="page"><span class="num">02</span>Projects</a>
+  <a href="resume.html"><span class="num">03</span>Resume</a>
+  <button class="themetoggle" type="button" aria-label="Switch theme">
+    <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+</nav>
+
+<div class="sheet">
+
+<a class="backlink" href="projects.html">← All projects</a>
+
+<header class="masthead">
+  <h1>ACSA<br>CFD Validation</h1>
+  <p class="role">A week at the Australian Centre for Sports Aerodynamics with two
+    cars, finding where our model was wrong and by how much.</p>
+  <div class="contact">
+    <span>Monash Motorsport</span>
+    <span>ACSA, Adelaide</span>
+    <span>DPMS instrumentation · MATLAB · Ansys Fluent</span>
+    <span>2026</span>
+  </div>
+</header>
+
+<section id="wind-tunnel">
+  <div class="row">
+    <div class="rowlabel">Project 03</div>
+    <div>
+      <div class="entry">
+
+        <div class="gallery" data-interval="5000">
+          <div class="gstage">
+            <figure class="gslide">
+              <img src="images/gallery/Project3/teamphoto.png" alt="Team Photo at the Australian Centre for Sports Aerodynamics in Adelaide">
+              <figcaption>Team Photo at the Australian Centre for Sports Aerodynamics in Adelaide.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project3/rearwingonly.png" alt="Rear Wing Only Test Configuration in the Wind Tunnel">
+              <figcaption>Rear Wing Only Test Configuration in the Wind Tunnel.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project3/measuringrake.png" alt="Measuring Rake behind the Side Diffuser in the Wind Tunnel">
+              <figcaption>Measuring Rake behind the Side Diffuser in the Wind Tunnel.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project3/anotheranglerake.png" alt="Angle Angle Rake behind the Side Diffuser in the Wind Tunnel">
+              <figcaption>Angle Angle Rake behind the Side Diffuser in the Wind Tunnel.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project3/day1setup.png" alt="Day 1 Setup in the Wind Tunnel with the 2025 Car and False Floor">
+              <figcaption>Day 1 Setup in the Wind Tunnel with the 2025 Car and False Floor.</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <h3>Wind Tunnel Testing</h3>
+
+        <p>
+          Earlier this year the aerodynamics department attended the Australian Centre for Sports
+          Aerodynamics in Adelaide with our 2024 and 2025 car for a week. The purpose of this
+          testing session was to validate our current CFD and turbulence modelling settings in
+          conjunction with one of our FYP groups and bringing 2 cars to establish geometric
+          independence with the CFD model. Why does a tunnel allow this? Through real life
+          on-track testing similar tests can be conducted within similar attitudes to what is
+          being simulated, with the addition of various uncontrollable variables that can skew
+          results. Examples of these variables being weather, track conditions, and so many more
+          that the use of a wind tunnel eliminates providing a significantly more controlled
+          environment.
+        </p>
+
+        <h3>Pre-Wind Tunnel Preparation</h3>
+
+        <p>
+          I helped manufacture a required tapped wing set in particular the front wing, rear wing,
+          &amp; keel step. The overall manufacturing was similar to what I had done previously,
+          identical layup methods; the only difference being drilling holes as required in high
+          interest CpT zones and then hot gluing air flow tubes into said holes to connect to
+          custom Dynamic Pressure Measurement Systems (DPMS) boxes developed by the FYP group, and
+          validated in a smaller wind tunnel available at the university. This was jigged onto the
+          car in preparation for the wind tunnel.
+        </p>
+
+        <figure class="plate">
+          <img src="images/tappedwing.png" alt="Tapped Rear Wing Bottom Skin">
+          <figcaption>Tapped Rear Wing Bottom Skin.</figcaption>
+        </figure>
+
+        <p>
+          Further I helped develop MATLAB scripts in 2 major areas. The first one focused on
+          looking at ideal locations to place wool tufts, in particular identifying high velocity,
+          swirling and low pressure locations based on post processing data to visually identify
+          and validate hypotheses in the flow structure noted in our then current CFD model. The
+          second script again taking into account various flow structures created an automated
+          transverse probe movement behind the rear wing, movement done by an actuated system
+          available from the wind tunnel. The transverse probe was key in getting values behind
+          the rear wing at various yaw angles and wind speeds.
+        </p>
+
+        <figure class="plate">
+          <img src="images/tufting.png" alt="Tufting Locations over CpS plot">
+          <figcaption>Tufting Locations over CpS plot.</figcaption>
+        </figure>
+
+        <h3>Testing at the Wind Tunnel</h3>
+
+        <p>
+          The tests conducted varied, with the first test being a baseline with all aerodynamic
+          devices removed and incrementally added on over various wind tunnel speeds, and yaw
+          angles. Further tests were run with DRS open, closed cockpit tests and with the various
+          tapped devices. A similar test was run with the 2024 car and in conjunction with
+          Adelaide FSAE team AUMT, on the final day due to having extra time and to trade geometry.
+          The tunnel did have blockage which was accounted for via CFD and the ground plane treated
+          using a false floor made to account for any boundary layer generation that may occur and
+          to avoid that. Limitations included no moving ground plane making it hard to measure true
+          rolling road, the load cells within the tunnel limited the tunnel to 12 degrees yaw and a
+          maximum wind speed of 19 m/s, with the tunnel containing a blockage ratio of 28% where it
+          is recommended to have 5%.
+        </p>
+
+
+        <h3>Post-Wind Tunnel Analysis</h3>
+
+        <p>
+          Overall downforce repeatability was within 2% over multiple days which was key providing
+          consistent results to compare with. Within the current CFD model there was 14% increase
+          in CLA compared to wind tunnel data which was consistent over the overall yaw sweeping
+          range; providing a performance positive, however in terms of CFD correlation is
+          something to be analysed more. Between the 2024 and 2025 cars the CDA at 0 degrees yaw
+          was exactly the same which was extremely interesting to note considering the geometry
+          difference between the 2.
+        </p>
+
+        <p>
+          The CFD model was over-estimating drag reduction in comparison to wind tunnel data, with
+          the tunnel showing a 33% drag reduction in the 2025 car with all aerodynamic devices and
+          DRS on &amp; off tests, whereas the CFD model noted a 42% decrease.
+        </p>
+
+        <p>
+          Overall improvements made to the current CFD model, in particular looking at moving from
+          a closed wheel CFD model to an open wheel CFD model. This was not done previously due to
+          the increase in computational time however with further discussed changes the script was
+          optimised to allow quicker meshing and run time. The turbulence model is to be switched
+          from the long-standing used k-epsilon model to k-omega SST. Further y-plus targets
+          switched from more than 20 to aiming for a y-plus less than 5. Overall lift force
+          accuracy went from a 23% discrepancy to approximately 10%, averaged over the yaw sweep.
+          As the FYP is still running more data is to be collected and understood to further
+          optimise the CFD model but there have been significant improvements as of now.
+        </p>
+
+
+        <figure class="plate">
+          <img src="images/closedwheels.png" alt="Closed Wheels M25 Test Configuration in the Wind Tunnel">
+          <figcaption>Closed Wheels Configuration.</figcaption>
+        </figure>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="row">
+    <div class="rowlabel">Next</div>
+    <div>
+      <a class="projlink noimg" href="project-accumulator-cooling.html">
+        <div>
+          <span class="num">01</span>
+          <h3>Accumulator Cooling: Ducting Design and CFD</h3>
+          <p>External sidepod ducting and the internal flow path for the M26 pack.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script src="theme.js" defer></script>
+<script src="gallery.js" defer></script>
+<script src="lightbox.js" defer></script>
+<script src="reveal.js" defer></script>
+</body>
+</html>
