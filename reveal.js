@@ -55,7 +55,7 @@
    ============================================================ */
 
 (function () {
-  var hero = document.querySelector('.hero[data-wall="full"]');
+  var hero = document.querySelector('.hero[data-wall="full"], .hero[data-wall="collage"]');
   if (!hero) return;
 
   function measure() {
