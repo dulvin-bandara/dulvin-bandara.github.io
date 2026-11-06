@@ -171,6 +171,108 @@ img:focus-visible{
 }
 .contact a:hover{color:var(--accent);border-bottom-color:var(--accent);}
 
+/* ============================================================
+   PHOTO WALL
+   <div class="hero" data-wall="band">  — strip under the masthead
+   <div class="hero" data-wall="full">  — full-bleed grid, name over it
+   Change that one word to switch layouts.
+   ============================================================ */
+
+.hero{position:relative;}
+.pw{--pw-h:196px;}
+.pw-item{margin:0;}
+.pw-item img{display:block;}
+
+/* --- band --- */
+
+/* the masthead tightens up when a band sits under it, so the strip
+   is visible on landing rather than parked below the fold */
+[data-wall="band"] .masthead{padding-top:24px;margin-bottom:40px;}
+[data-wall="band"] .masthead h1{font-size:clamp(46px,9vw,104px);margin-bottom:18px;}
+[data-wall="band"] .masthead .role{margin-bottom:24px;}
+[data-wall="band"] .contact{padding-top:14px;}
+
+[data-wall="band"] .pw{
+  overflow:hidden;
+  margin:0 0 72px;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%);
+}
+[data-wall="band"] .pw-track{
+  display:flex;
+  gap:12px;
+  width:max-content;
+  animation:pw-drift 90s linear infinite;
+}
+[data-wall="band"] .pw:hover .pw-track,
+[data-wall="band"] .pw:focus-within .pw-track{animation-play-state:paused;}
+[data-wall="band"] .pw-item{flex:0 0 auto;height:var(--pw-h);}
+[data-wall="band"] .pw-item img{
+  height:100%;
+  width:auto;
+  border:1px solid var(--rule);
+  background:#fff;
+}
+
+@keyframes pw-drift{
+  from{transform:translateX(0);}
+  to{transform:translateX(calc(-50% - 6px));}
+}
+
+/* --- full bleed --- */
+
+[data-wall="full"]{
+  min-height:92vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding-bottom:30px;
+}
+[data-wall="full"] .pw{
+  position:absolute;
+  top:0;bottom:0;left:50%;
+  transform:translateX(-50%);
+  width:100vw;
+  overflow:hidden;
+  z-index:0;
+}
+[data-wall="full"] .pw-track{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:1fr;
+  gap:3px;
+  height:100%;
+  width:auto;
+  animation:none;
+}
+[data-wall="full"] .pw-dup{display:none;}
+[data-wall="full"] .pw-item{overflow:hidden;}
+[data-wall="full"] .pw-item img{width:100%;height:100%;object-fit:cover;border:none;}
+[data-wall="full"] .pw::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top,
+    rgba(9,12,15,.94) 0%,
+    rgba(9,12,15,.80) 38%,
+    rgba(9,12,15,.55) 100%);
+}
+[data-wall="full"] .masthead{
+  position:relative;
+  z-index:1;
+  margin-bottom:0;
+  border-top-color:rgba(255,255,255,.8);
+  color:#fff;
+}
+[data-wall="full"] .masthead h1{color:#fff;}
+[data-wall="full"] .masthead .role{color:rgba(255,255,255,.84);}
+[data-wall="full"] .contact{
+  color:rgba(255,255,255,.74);
+  border-top-color:rgba(255,255,255,.26);
+}
+[data-wall="full"] .contact a{color:rgba(255,255,255,.74);border-bottom-color:rgba(255,255,255,.38);}
+[data-wall="full"] .contact a:hover{color:#fff;border-bottom-color:#fff;}
+
 /* ---------- spec-sheet rows ---------- */
 
 section{
@@ -718,7 +820,12 @@ li{margin-bottom:7px;}
 
   html,body{background:#fff;color:#000;font-size:10pt;line-height:1.42;}
   .sheet{max-width:none;padding:0;}
-  .sitenav,.themetoggle,.backlink{display:none;}
+  .sitenav,.themetoggle,.backlink,.pw{display:none;}
+  [data-wall="full"]{min-height:0;padding-bottom:0;}
+  [data-wall="full"] .masthead,
+  [data-wall="full"] .masthead h1{color:#000;}
+  [data-wall="full"] .masthead .role,
+  [data-wall="full"] .contact{color:#444;}
 
   .js-reveal .reveal,
   .js-reveal .reveal.is-visible{opacity:1;transform:none;}
@@ -789,6 +896,9 @@ li{margin-bottom:7px;}
 
 @media (max-width:980px){
   :root{--gutter:30px;}
+  .pw{--pw-h:170px;}
+  [data-wall="band"] .pw{margin-bottom:54px;}
+  [data-wall="full"] .pw-track{grid-template-columns:repeat(3,1fr);}
   .row{grid-template-columns:1fr;gap:16px;}
   .rowlabel{padding-top:0;}
   .sheet{padding:30px var(--gutter) 90px;}
@@ -799,6 +909,10 @@ li{margin-bottom:7px;}
 
 @media (max-width:620px){
   :root{--gutter:20px;}
+  .pw{--pw-h:124px;}
+  [data-wall="band"] .pw{margin-bottom:40px;}
+  [data-wall="full"]{min-height:84vh;}
+  [data-wall="full"] .pw-track{grid-template-columns:repeat(2,1fr);}
   body{font-size:16px;}
   .masthead{padding-top:24px;margin-bottom:46px;}
   .masthead .role{margin-bottom:26px;}
@@ -817,5 +931,6 @@ li{margin-bottom:7px;}
   html{scroll-behavior:auto;}
   *{transition:none !important;animation:none !important;}
   .js-reveal .reveal{opacity:1;transform:none;}
+  [data-wall="band"] .pw{overflow-x:auto;}
   @view-transition{navigation:none;}
 }
