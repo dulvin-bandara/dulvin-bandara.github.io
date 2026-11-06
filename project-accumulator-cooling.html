@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accumulator Cooling: Ducting Design and CFD — Dulvin Bandara</title>
+<meta name="description" content="External sidepod ducting and the internal flow path for the M26 accumulator. 0.768 CLA recovered across the design iteration, with accumulator mass flow raised from 0.008 to 0.021 kg/s.">
+
+<script>
+(function(){try{var s=localStorage.getItem('theme');
+document.documentElement.setAttribute('data-theme',
+s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+}catch(e){}})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="canonical" href="https://dulvinbandara.com/project-accumulator-cooling.html">
+<meta name="author" content="Dulvin Bandara">
+<meta name="theme-color" content="#FAF9F6">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dulvin Bandara">
+<meta property="og:url" content="https://dulvinbandara.com/project-accumulator-cooling.html">
+<meta property="og:title" content="Accumulator Cooling: Ducting Design and CFD">
+<meta property="og:description" content="External sidepod ducting and the internal flow path for the M26 accumulator, with 0.768 CLA recovered across the design iteration.">
+<meta property="og:image" content="https://dulvinbandara.com/images/ducts.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Isometric view of the accumulator cooling ducting">
+<meta property="og:locale" content="en_AU">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Accumulator Cooling: Ducting Design and CFD">
+<meta name="twitter:description" content="Ducting design and CFD for the M26 accumulator at Monash Motorsport.">
+<meta name="twitter:image" content="https://dulvinbandara.com/images/ducts.png">
+</head>
+<body>
+
+<nav class="sitenav">
+  <a href="index.html"><span class="num">01</span>Index</a>
+  <a href="projects.html" aria-current="page"><span class="num">02</span>Projects</a>
+  <a href="resume.html"><span class="num">03</span>Resume</a>
+  <button class="themetoggle" type="button" aria-label="Switch theme">
+    <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+</nav>
+
+<div class="sheet">
+
+<a class="backlink" href="projects.html">← All projects</a>
+
+<header class="masthead">
+  <h1>Accumulator<br>Cooling</h1>
+  <p class="role">Ducting design and CFD for the M26 pack — cooling that pays back
+    most of what it costs the floor.</p>
+  <div class="contact">
+    <span>Monash Motorsport</span>
+    <span>Senior Aerodynamics Engineer, Head of Cooling subsection</span>
+    <span>Ansys Fluent 25R1 · PyFluent · M3 MASSIVE HPC</span>
+    <span>2026</span>
+  </div>
+</header>
+
+<section id="accumulator-cooling">
+  <div class="row">
+    <div class="rowlabel">Project 01</div>
+    <div>
+      <div class="entry">
+
+        <div class="gallery" data-interval="5000">
+          <div class="gstage">
+            <figure class="gslide">
+              <img src="images/gallery/Project1/externalduct.png" alt="Sidepod external duct geometry in NX">
+              <figcaption>External sidepod duct, inspired by ground-effect era F1 sidepods.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project1/internalducts.png" alt="Internal Ducting from Monocoque to Akku and Akku to Rear Bulkhead in NX">
+              <figcaption>Internal ducting from monocoque to accumulator and accumulator to rear bulkhead.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project1/cptx.png" alt="Coefficient of Total Pressure X-Slice through the reverse duct and into the accumulator">
+              <figcaption>Coefficient of Total Pressure X-Slice through the reverse duct and into the accumulator.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project1/cpty.png" alt="Coefficient of Total Pressure Y-Slice through the reverse duct and into the accumulator">
+              <figcaption>Coefficient of Total Pressure Y-Slice through the reverse duct and into the accumulator.</figcaption>
+            </figure>
+            <figure class="gslide">
+              <img src="images/gallery/Project1/velakkucontour.png" alt="Y-Velocity contour through the accumulator">
+              <figcaption>Y-Velocity contour through the accumulator.</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <h3>Why are we Cooling?</h3>
+
+        <p>
+          The M26 accumulator for the 2026 Monash Motorsport car is a 120s1p, 6.38&nbsp;kWh
+          air-cooled pack. The problem is that the cooling configuration presented in January
+          has poor flow management and no consideration of airflow at the vehicle level. My
+          solution for the project aims to develop a more vehicle-flow-focused cooling system,
+          reducing the overall accumulator temperatures without impacting the overall
+          vehicle-flow and integration.
+        </p>
+
+        <p>
+          Cooling exists so the pack is able to run a full endurance duty cycle at a reduced
+          capacity. PACSIM simulations showed a 4.8&nbsp;kWh pack is able to match the endurance
+          performance of a 9.4kg heavier uncooled pack. Following 2026 points sensitivities,
+          it was estimated that a reduction in mass by 9.4&nbsp;kg provided a competition points
+          gain of 20.57, a high sensitivity parameter vital for overall car performance.
+        </p>
+
+        <h3>Developing the Ducting</h3>
+
+        <p>
+          Airflow has to be brought into the accumulator from somewhere, and through preliminary
+          simulations, the ducting was competing for air volume from the side diffuser and
+          undertray, which are aerodynamically very costly parts. The side diffuser CLA dropped
+          from 1.369 to 0.963, and the undertray dropped from 0.980 to 0.686, compared with a
+          regular sealed duct reference case.
+        </p>
+
+        <p>
+          Following more targeted design iterations, a &ldquo;sidepod&rdquo; esque external duct was
+          investigated, inspired by the ground-effect era Formula 1 cars. This proved to be a
+          vital stepping stone in solving the CLA drop, pushing it to an overall 5.174, from a
+          costly 4.406 in the sealed duct case. The aerodynamic balance of the car also shifted
+          from 48.8% to 50%, an overall benefit there as well. The sidepod also contains angled
+          louvres towards the bottom, providing a water ingress concern solution.
+        </p>
+
+        <div class="figures">
+          <div class="fig"><span class="val">+0.768</span><span class="cap">CLA, initial to final cooling configuration</span></div>
+          <div class="fig"><span class="val">+0.367</span><span class="cap">Side diffuser CLA recovered</span></div>
+          <div class="fig"><span class="val">+0.189</span><span class="cap">Undertray CLA recovered</span></div>
+          <div class="fig"><span class="val">50.0%</span><span class="cap">Aero balance, final configuration</span></div>
+        </div>
+
+        <p>
+          Investigating the external ducts, studies were done on the positioning of the inlet
+          hole, inlet hole and other performance enhancers. Investigating the overall inlet
+          positioning in the x direction was a key factor in maximising the flow into and through
+          the accumulator.
+        </p>
+
+        <figure class="plate">
+          <img src="images/inletlength.png"
+               alt="Monocoque inlet mass flow against inlet length">
+          <figcaption>Monocoque inlet mass flow against streamwise inlet position.</figcaption>
+        </figure>
+
+        <p>
+          Another concern, brought up during design reviews was water ingress into the
+          accumulator. To account for this 2 options were looked into, a waterproof mesh and
+          louvres. Physically speaking if there was no airflow impact the waterproof mesh was
+          the most viable option. Ordering a waterproof mesh and conducting some tests in an
+          wind-tunnel esque set-up below showed to block approximately 85-90% of the airflow,
+          proving the mesh to be infeasible.
+        </p>
+
+        <figure class="plate">
+          <img src="images/meshmockup.png"
+               alt="Bench set-up used to measure airflow blockage through the waterproof mesh">
+          <figcaption>Bench set-up used to measure flow blockage through the waterproof mesh. Measured blockage of 85–90% ruled the mesh out.</figcaption>
+        </figure>
+
+        <p>
+          The louvres were looked at from then onwards at the bottom of the sidepod design.
+          Taking 3 louvres with dimensions 50mm x 100mm. Provided the best water pathway per
+          preliminary testing. During investigation of the louvres, a sweep of various angles
+          with reference to the original positioning was conducted, unfortunately during the
+          sweep the 12 degree angled louvre failed during the mesh process. However the following
+          results were gathered. Noting the results as the louvre angle increased the mass flow
+          into the monocoque did decrease, however very minimally. On the opposite end the CLA
+          did increase through air leaking onto the side diffuser and consequently into the
+          undertray. Taking both factors into consideration the CLA benefit overrode the overall
+          mass flow deficit due to it being so small and thus a louvre angle of 15 degrees.
+        </p>
+
+        <div class="plaperow">
+          <figure class="plate">
+            <img src="images/coqueinlet.png" alt="Monocoque inlet mass flow against louvre angle">
+            <figcaption>Monocoque inlet mass flow against louvre angle.</figcaption>
+          </figure>
+          <figure class="plate">
+            <img src="images/clatotal.png" alt="Total CLA against louvre angle">
+            <figcaption>Total CLA against louvre angle.</figcaption>
+          </figure>
+          <figure class="plate">
+            <img src="images/clacomp.png" alt="Component CLA against louvre angle">
+            <figcaption>Component CLA against louvre angle. 12&deg; failed to mesh and is omitted.</figcaption>
+          </figure>
+        </div>
+
+        <p>
+          Vortex generators were a final late addition onto the external ducts, for 2 reasons
+          generating high energy vortices to reduce air flow separation in the ducts, since water
+          being more dense than air pushing the air upwards while the water would leak down
+          through the louvres with gravity.
+        </p>
+
+                <p>
+          In parallel with these external ducts, internal ducting from the monocoque to the
+          accumulator and from the accumulator outletting through the rear bulkhead were
+          developed. In tandem with the external ducts, the key indicators of a good design were
+          maximising the mass flow of air entering the accumulator and the overall uniformity of
+          the velocity. Why? The mass flow is a key indicator of the volume of air being pushed
+          through; the higher the mass flow, the greater the heat rejection available, bounded by
+          what the fan can deliver. The uniformity is a scale from 0-1 showing how the velocity
+          varies over a surface, with a value of 1 indicating perfectly uniform velocity over a
+          surface, with lower values increasing the variation in velocity, using an area-weighted
+          uniformity. By comparing these 2 metrics from the monocoque internal hole to the
+          entrance of the accumulator, we were able to identify how the changes in ducting design
+          impacted the hypothesised cooling performance.
+        </p>
+
+        <p>
+          The design of the internal ducting had a reverse ducting system due to the entrance of
+          the accumulator being further forward than the monocoque internal wall. To account for
+          any energy losses in the air that might occur, an investigation into turning vanes was
+          conducted, improving the overall airflow uniformity and mass flow of the air entering
+          the accumulator.
+        </p>
+
+        <h3>CFD Simulation Set-Up</h3>
+
+        <p>
+          The CFD simulation was conducted using a half-car symmetry model, taking into account
+          ground effect and rotating wheels. The cooling pipeline, in particular, treated the
+          accumulator as a container with segments split into the cell tabs and overall cells.
+          The monocoque was hollowed out to account for any internal flow that may occur while
+          unlikely in a sealed ducting system. A pressure-jump fan boundary condition was applied
+          to the radiator and rear bulkhead fans, with a realizable k-epsilon with enhanced wall
+          treatment turbulence model being used. Convergence was driven via report monitors on
+          CLA &amp; CDA, using PRESTO! for pressure interpolation, pseudo-transient continuation,
+          and a velocity inlet specified by 5% intensity and a viscosity ratio of 10.
+        </p>
+
+        <p>
+          The final mesh contained 35.5M cells, with a skewness of 5.54E-11 and an orthogonal
+          quality of 0.94. During the course of the campaign, multiple mesh debugs were taken
+          into consideration through various self-intersection methods when defining fans and
+          ensuring interior zones were properly defined to solve the fans.
+        </p>
+
+        <h3>Summary of Project</h3>
+
+        <p>
+          Over the course of the project, 94 design runs were completed, averaging approximately
+          5 hours per run. The mass flow rate through the accumulator was recorded at
+          0.021&nbsp;kg/s, a massive improvement over the previously presented 0.008&nbsp;kg/s,
+          and a velocity uniformity of 0.943. Furthermore, the CLA had increased by 0.768, with
+          the centre of pressure of the car moving from 48.8% to 50% from initial cooling runs.
+          Current work focuses on manufacturing the ducts and finalising the thermal values, a
+          direct measure of the work.
+        </p>
+
+        <div class="figures">
+          <div class="fig"><span class="val">&lt;20%</span><span class="cap">CFD vs hand-calc pressure drop agreement</span></div>
+          <div class="fig"><span class="val">5 mm</span><span class="cap">Selected inter-cell air gap</span></div>
+          <div class="fig"><span class="val">2.81 K/W</span><span class="cap">Cell surface to air, at operating point</span></div>
+          <div class="fig"><span class="val">0.197 W/K</span><span class="cap">Total pack cooling, against 0.2 target</span></div>
+        </div>
+
+        <p class="scope">Scope: the thermal resistance modelling and cooling-method trade
+          study (cell body vs tab vs PCM) were produced by teammates in the electrical
+          powertrain group, and the mesh independence study by a peer. My contribution was
+          the duct design, the CFD setup and boundary conditions, and the meshing and
+          solver debugging.</p>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="row">
+    <div class="rowlabel">Next</div>
+    <div>
+      <a class="projlink noimg" href="project-cfd-workflow.html">
+        <div>
+          <span class="num">02</span>
+          <h3>Building Cooling into the CFD workflow</h3>
+          <p>The workflow this project depended on, and the three attempts it took to get
+            a fan boundary condition to define at all.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script src="theme.js" defer></script>
+<script src="gallery.js" defer></script>
+<script src="lightbox.js" defer></script>
+<script src="reveal.js" defer></script>
+</body>
+</html>
