@@ -47,3 +47,31 @@
     });
   });
 })();
+
+/* ============================================================
+   Full-bleed hero: size it to the space actually left below the
+   nav, so it ends exactly at the fold instead of overshooting by
+   however tall the nav happens to render.
+   ============================================================ */
+
+(function () {
+  var hero = document.querySelector('.hero[data-wall="full"]');
+  if (!hero) return;
+
+  function measure() {
+    hero.style.removeProperty('--hero-offset');
+    var top = hero.getBoundingClientRect().top + window.scrollY;
+    hero.style.setProperty('--hero-offset', Math.round(top) + 'px');
+  }
+
+  measure();
+  // fonts change the nav height once they swap in
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+  window.addEventListener('load', measure);
+
+  var t;
+  window.addEventListener('resize', function () {
+    clearTimeout(t);
+    t = setTimeout(measure, 120);
+  });
+})();
