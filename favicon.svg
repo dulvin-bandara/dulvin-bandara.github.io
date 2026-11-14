@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    rect{fill:#11151A}
+    text{fill:#FAF9F6}
+    @media (prefers-color-scheme:dark){rect{fill:#ECEAE5}text{fill:#0E1114}}
+  </style>
+  <rect width="32" height="32"/>
+  <text x="16" y="22" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="-1">DB</text>
+  <rect x="5" y="25" width="22" height="2" style="fill:#B4432A"/>
+</svg>

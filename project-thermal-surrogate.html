@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Surrogate Thermal Model: Gaussian Process and Transient Network — Dulvin Bandara</title>
+<meta name="description" content="A Gaussian process surrogate trained on full-car CFD, coupled to a 120-cell transient thermal network in Python. Held-out R² of 0.9932, verified fourth-order integration, tested and documented.">
+
+<meta name="theme-color" content="#FAF9F6">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+<script>
+(function(){try{var d=document.documentElement,s=localStorage.getItem('theme'),
+t=s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+d.setAttribute('data-theme',t);
+var m=document.querySelector('meta[name="theme-color"]');
+if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'#FAF9F6'));
+}catch(e){}})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="canonical" href="https://dulvinbandara.com/project-thermal-surrogate.html">
+<meta name="author" content="Dulvin Bandara">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dulvin Bandara">
+<meta property="og:url" content="https://dulvinbandara.com/project-thermal-surrogate.html">
+<meta property="og:title" content="Surrogate Thermal Model: Gaussian Process and Transient Network">
+<meta property="og:description" content="A Gaussian process surrogate trained on full-car CFD, coupled to a 120-cell transient thermal network. Python, scikit-learn, pytest.">
+<meta property="og:image" content="https://dulvinbandara.com/images/og/home.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Isometric view of the accumulator cooling ducting">
+<meta property="og:locale" content="en_AU">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Surrogate Thermal Model: Gaussian Process and Transient Network">
+<meta name="twitter:description" content="Machine-learning surrogate and transient thermal model for the M26 accumulator at Monash Motorsport.">
+<meta name="twitter:image" content="https://dulvinbandara.com/images/og/home.jpg">
+</head>
+<body>
+
+<!-- ======================================================================
+     DRAFT — written from the report and the repository README for you to
+     finalise. Every number on this page is taken from the report; nothing
+     is invented. Comments marked "DRAFT NOTE" are prompts for you and can
+     be deleted once dealt with. Search this file for "DRAFT NOTE".
+     ====================================================================== -->
+
+<a class="skiplink" href="#main">Skip to Content</a>
+
+<nav class="sitenav" aria-label="Primary">
+  <a href="index.html"><span class="num">01</span>Index</a>
+  <a href="projects.html" aria-current="page"><span class="num">02</span>Projects</a>
+  <a href="resume.html"><span class="num">03</span>Resume</a>
+  <button class="themetoggle" type="button" aria-label="Switch theme">
+    <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+</nav>
+
+<main class="sheet" id="main">
+
+<a class="backlink" href="projects.html"><span class="arrow" aria-hidden="true">←</span>All Projects</a>
+
+<header class="masthead">
+  <h1>Surrogate<br>Thermal Model</h1>
+  <p class="role">A Gaussian process trained on full-car CFD, feeding a transient thermal
+    network — accumulator cell temperatures from vehicle attitude, without another
+    6.5-hour simulation.</p>
+  <div class="contact">
+    <span>Monash Motorsport</span>
+    <span>Individual project, MMA3001 Numerical Methods &amp; Machine Learning</span>
+    <span translate="no">Python · scikit-learn · NumPy · pytest</span>
+    <span>2026</span>
+  </div>
+</header>
+
+<section id="thermal-surrogate">
+  <div class="row">
+    <h2 class="rowlabel">Project 01</h2>
+    <div>
+      <div class="entry">
+
+        <!-- DRAFT NOTE: the GitHub link below returned "not found" when checked without
+             a login, so the repository is currently private. Make it public (or swap the
+             URL) before this page goes live, otherwise a recruiter hits a 404. -->
+        <ul class="linkrow">
+          <li><a class="linkbtn" href="https://github.com/DulvinBandara/DulvinRepositoryProject" target="_blank" rel="noopener">View the Repository <span class="ext" aria-hidden="true">↗</span></a></li>
+          <li><a class="linkbtn" href="reports/thermal-surrogate-report.pdf" target="_blank" rel="noopener">Read the Report (PDF, 10&nbsp;pages)</a></li>
+          <li><a class="linkbtn" href="docs/thermal-surrogate/accumulatorThermal.html">Browse the API Docs</a></li>
+        </ul>
+
+        <div class="figures">
+          <div class="fig"><span class="val">0.9932</span><span class="cap">Held-out R², Gaussian process against full-car CFD</span></div>
+          <div class="fig"><span class="val">2.1%</span><span class="cap">Held-out RMSE, as a share of mean mass flow</span></div>
+          <div class="fig"><span class="val">8 / 8</span><span class="cap">Held-out cases inside the ±2σ band</span></div>
+          <div class="fig"><span class="val">4.008</span><span class="cap">Observed order of accuracy, against a theoretical 4</span></div>
+        </div>
+
+        <h3 id="why">Why a Surrogate?</h3>
+
+        <!-- DRAFT NOTE: this section is the "so what". If you want one paragraph in your
+             own voice on the whole page, make it this one. -->
+        <p>
+          The M26 sidepod ducting takes its cooling air from the external aerodynamics, so the
+          air reaching the accumulator changes with speed and ride height. Nobody on the team
+          could say by how much. A full-car CFD case takes roughly 6.5&nbsp;hours on 16&nbsp;cores
+          and 180&nbsp;GB of RAM, so a three-variable design space cannot be swept directly — and
+          a steady solution cannot return a transient cell temperature at all.
+        </p>
+
+        <p>
+          This project replaces that sweep with a model. It takes the three things a vehicle
+          dynamicist controls — velocity, front ride height and rear ride height — and returns
+          the thing a thermal engineer needs: cell temperatures over a 40-minute endurance
+          event, with an uncertainty attached.
+        </p>
+
+        <h3 id="model">A Two-Stage Model</h3>
+
+        <p>
+          Stage 1 is a Gaussian process surrogate that maps vehicle attitude to the cooling mass
+          flow captured at the sidepod inlet. Stage 2 is a channel-resolved transient thermal
+          network that converts that mass flow into the temperature of each of the 120 cells.
+          Mass flow is an intermediate quantity, not something the user supplies.
+        </p>
+
+<pre class="code" translate="no" tabindex="0" aria-label="Example: predicting cell temperatures from vehicle attitude"><code>surrogate, metrics, _, _ = fitBoth(loadSweep("data/normalisedSweep.tsv"))
+
+model = AccumulatorModel(
+    surrogate=surrogate,
+    cell=CellProperties(), air=AirProperties(), geometry=PackGeometry(),
+    currentProfile=constantCurrent(73.0),   # A per cell, RMS
+    inletTemperature=313.15,                # K
+)
+
+result = model.predict(
+    VehicleCondition(velocity=15.0, frontRideHeight=32.0, rearRideHeight=34.0),
+    initialTemperature=303.15,
+    duration=2400.0,
+)
+
+result.peakTemperature()    # K, hottest of the 120 cells
+result.margin(333.15)       # K, against the 60 °C rules limit</code></pre>
+
+        <p>
+          Conditions outside the envelope the surrogate was trained on still return a prediction,
+          but it comes back flagged as extrapolated with a warning, so an out-of-range answer
+          cannot be mistaken for a result.
+        </p>
+
+        <h3 id="surrogate">Stage 1: The Mass-Flow Surrogate</h3>
+
+        <p>
+          The training data is a CFD campaign I designed and ran on the M3 MASSIVE cluster. The
+          design space was sampled with a Latin hypercube over 8.03–21.99&nbsp;m/s and roughly
+          20–48&nbsp;mm of ride height at each axle, with fixed seeds so the run matrix is
+          reproducible. Of 56 cases designed, 34 converged and were used: 26 for fitting and
+          8 held out. The two groups came from independent seeds, so the split was fixed by the
+          experiment design rather than picked after seeing results.
+        </p>
+
+        <p>
+          The model is a Gaussian process with a squared-exponential kernel, one length scale
+          per input, and an additive white-noise term, fitted in <code translate="no">scikit-learn</code>
+          on standardised inputs by maximising the log marginal likelihood from 8 restarts.
+          To check that the complexity was earned rather than assumed, 3 simpler baselines
+          were fitted to the same 26 cases and scored on the same 8.
+        </p>
+
+        <div class="tablewrap">
+        <table class="dtable">
+          <caption>Held-out performance, 8 cases no model saw during fitting</caption>
+          <thead>
+            <tr><th scope="col" style="text-align:left">Model</th><th scope="col">RMSE, % of mean</th><th scope="col">R²</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Linear, velocity only</th><td>6.7</td><td>0.9299</td></tr>
+            <tr><th scope="row">Linear, all 3 inputs</th><td>4.1</td><td>0.9738</td></tr>
+            <tr><th scope="row">Quadratic response surface</th><td>2.8</td><td>0.9877</td></tr>
+            <tr><th scope="row">Gaussian process</th><td>2.1</td><td>0.9932</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <div class="plaperow">
+          <figure class="plate">
+            <img src="images/gallery/Project4/parity.png" alt="Parity plot of surrogate prediction against CFD mass flow for the 8 held-out cases, with two-sigma error bars, all on the diagonal" width="1109" height="812" loading="lazy" decoding="async">
+            <figcaption>Surrogate prediction against CFD on the 8 held-out cases. Error bars are ±2σ; all 8 cover the true value.</figcaption>
+          </figure>
+          <figure class="plate">
+            <img src="images/gallery/Project4/massFlow.png" alt="Captured mass flow against vehicle velocity, showing the surrogate mean and two-sigma band with training and held-out CFD points" width="1109" height="812" loading="lazy" decoding="async">
+            <figcaption>Captured mass flow against velocity: surrogate mean and ±2σ band, with the 26 training and 8 held-out CFD cases.</figcaption>
+          </figure>
+        </div>
+
+        <p>
+          Two results mattered more than the headline accuracy. First, the fitted length scales
+          are an answer in themselves: velocity and front ride height carry the response, while
+          the rear ride height length scale came out at about 25 times its swept range. The
+          model worked out that rear ride height barely matters without being told, and a
+          separate linear sensitivity check agreed.
+        </p>
+
+        <p>
+          Second, the uncertainty is honest about its own limits. The held-out error sits
+          between the fitted noise floor and the scatter between near-identical CFD cases,
+          which is where a model that is not over-fitting should sit. And 8 of 8 inside a 95%
+          band is consistent with good calibration but cannot prove it — at 8 samples the
+          expected count is 7.6, so an over-cautious model would score the same.
+        </p>
+
+        <h3 id="network">Stage 2: The Thermal Network</h3>
+
+        <p>
+          The pack is modelled as 24 parallel cooling channels, each 5 cells deep, which gives
+          the 120 cells of the 120s1p layout. Each cell is a thermal node with ohmic heat
+          generation, convection to the air in its slot, and conduction to its neighbours
+          through the busbar tabs. The air temperature is marched downstream, so every cell
+          sees air already warmed by the cells in front of it. That produces 120 coupled
+          ordinary differential equations, integrated with classical fourth-order Runge–Kutta
+          at a 2&nbsp;s step over the 2400&nbsp;s event.
+        </p>
+
+        <p>
+          That downstream march is the reason for resolving channels at all. The single-node
+          lumped model the team currently uses carries one air temperature for the whole pack, and
+          against the network it under-predicts the peak cell temperature by 7 to 12&nbsp;K. At a
+          60&nbsp;°C limit, that is the difference between a design that looks compliant and one
+          that is not.
+        </p>
+
+        <div class="plaperow">
+          <figure class="plate">
+            <img src="images/gallery/Project4/transient.png" alt="Temperature against time over 40 minutes for the network peak cell, network pack mean and single-node lumped model, with the 60 degree limit marked" width="1109" height="812" loading="lazy" decoding="async">
+            <figcaption>Peak cell, pack mean and the single-node lumped baseline over a 40-minute endurance event.</figcaption>
+          </figure>
+          <figure class="plate">
+            <img src="images/gallery/Project4/channelProfile.png" alt="Cell and local air temperature at each of the five cell positions along one cooling channel at the worst-case condition" width="1109" height="812" loading="lazy" decoding="async">
+            <figcaption>Cell and local air temperature along one channel at the worst case. The air warms far more than the cell-to-air gap.</figcaption>
+          </figure>
+        </div>
+
+        <h3 id="verification">Verifying the Numerics</h3>
+
+        <p>
+          Verification asks whether the code solves the equations it claims to, separately from
+          whether those equations describe the pack. Each check compares against something that
+          exists independently of the implementation.
+        </p>
+
+        <ul>
+          <li>A single cell with no conduction reduces to a closed-form solution; the integrator
+            matches it to a relative error of 9.6&nbsp;×&nbsp;10<sup>−10</sup>.</li>
+          <li>Halving the time step cuts the error 16-fold on the full 120-cell network, an
+            observed order of 4.008 against a theoretical 4.</li>
+          <li>Energy generated equals energy removed plus energy stored over the full event, to a
+            relative residual of 1.59&nbsp;×&nbsp;10<sup>−7</sup>.</li>
+          <li>The analytical stability limit of 730&nbsp;s predicts where the explicit scheme
+            actually diverges.</li>
+        </ul>
+
+        <figure class="plate narrow">
+          <img src="images/gallery/Project4/convergence.png" alt="Log-log plot of temperature error against time step, with measured points following a slope of four" width="1109" height="812" loading="lazy" decoding="async">
+          <figcaption>Temporal convergence of the full network: measured order 4.008 against the slope-4 reference.</figcaption>
+        </figure>
+
+        <p>
+          I had assumed the system would be stiff and built a backward Euler solver with Newton
+          iteration for it. Measuring showed the opposite: the stability limit is two orders of
+          magnitude above any step needed for accuracy, and the implicit scheme cost 30.8 times
+          the function evaluations for a less accurate answer. It stays in the repository as the
+          comparison, not as the solver.
+        </p>
+
+        <h3 id="results">What the Model Says About the Car</h3>
+
+        <!-- DRAFT NOTE: the report says "of the 48.2 K rise, 39.7 K comes from the air and
+             19.9 K from the cell-to-air difference". Those two add to 59.6 K, not 48.2 K
+             (the hottest cell does not see the full outlet air rise). The wording below
+             avoids implying they sum; worth tidying the same sentence in the report. -->
+        <p>
+          The thermally limiting condition is low speed, not high. Cooling flow scales almost
+          linearly with velocity, so the worst case across the envelope is 8.03&nbsp;m/s with the
+          front lowered and the rear raised: a predicted peak of 88.2&nbsp;°C against the
+          60&nbsp;°C rules limit. Only 2 of the 14 conditions evaluated stay under the limit, both
+          at the top of the speed range with the front raised.
+        </p>
+
+        <figure class="plate">
+          <img src="images/gallery/Project4/envelopeGrid.png" alt="Three contour maps of peak cell temperature over front and rear ride height at 8, 15 and 22 metres per second, on a shared colour scale" width="2363" height="808" loading="lazy" decoding="async">
+          <figcaption>Peak cell temperature across the ride-height plane at 3 speeds. Near-vertical contours show front ride height dominating; the 60&nbsp;°C contour appears only at the highest speed.</figcaption>
+        </figure>
+
+        <p>
+          The more useful finding is why. At the worst case the air warms by 39.7&nbsp;K between
+          inlet and outlet, while the cell-to-air temperature gap is only 19.9&nbsp;K. The pack is
+          limited by how much heat the air can carry away, not by how well heat gets into the
+          air. More surface area or more turbulence would not fix it; more total air would. For
+          the car, that points effort at inlet area, duct losses and fan selection rather than
+          at ride-height setup.
+        </p>
+
+        <h3 id="limits">What It Does Not Show</h3>
+
+        <p>
+          The dominant uncertainty is the cell’s DC internal resistance, which was scaled from
+          the datasheet AC impedance rather than measured. Across its plausible range it moves
+          the predicted peak by 31.8&nbsp;K, far more than any other assumption tested, so the
+          absolute temperatures should be read as a band rather than a number.
+        </p>
+
+        <figure class="plate narrow">
+          <img src="images/gallery/Project4/sensitivity.png" alt="Bar chart of peak cell temperature at the bounds of internal resistance and specific heat, with internal resistance spanning about 69 to 100 degrees" width="1109" height="812" loading="lazy" decoding="async">
+          <figcaption>Peak cell temperature at the bounds of the 2 assumed properties. Internal resistance spans 31.8&nbsp;K; specific heat spans 2.2&nbsp;K.</figcaption>
+        </figure>
+
+        <p>
+          Nothing in the chain has been compared against a measured cell temperature. The
+          thermal network is verified against closed-form solutions and the surrogate is
+          validated against the CFD it was trained on, but that is not experimental validation.
+          The CFD campaign was also run without the cooling package present, so the mass flow is
+          air available at the inlet rather than air delivered through the duct. Measuring the
+          cell resistance and re-running the sweep with the package in place are the next two
+          steps, and neither needs a change to the model.
+        </p>
+
+        <h3 id="software">Built to Be Rerun</h3>
+
+        <!-- DRAFT NOTE: this is the section most relevant to a software role. Add anything
+             true that is missing — e.g. how long a full prediction takes to run, or how the
+             PyFluent sweep tooling was structured. -->
+        <p>
+          The model is an installable Python package, <code translate="no">accumulatorThermal</code>,
+          split so each module does one thing: properties, correlations, heat source, network,
+          integrators, validation, surrogate, and a composed top-level model. A pytest suite of
+          8 tests covers the property database and the verification checks above and writes a
+          JUnit report. The API documentation is generated from the docstrings with
+          <code translate="no">pdoc</code>.
+        </p>
+
+        <p>
+          The pipeline from CFD to result is scripted end to end: a seeded sweep generator
+          writes the run matrix, one SLURM job per case runs on the cluster, a post-solve step
+          extracts mass flow from each saved solution, and a normalisation script produces the
+          committed dataset. The extraction reports the measurement plane’s wetted area
+          alongside the mass flow, because a plane that lands inside solid geometry integrates
+          to exactly zero and would otherwise be indistinguishable from no flow.
+        </p>
+
+        <p>
+          Raw CFD output is team intellectual property, so the repository commits a
+          non-dimensional dataset and the script that derives it. The surrogate accuracy metrics
+          on this page are scale-free and reproduce from that committed data, and one script
+          regenerates every figure in the report.
+        </p>
+
+        <div class="figures">
+          <div class="fig"><span class="val">34</span><span class="cap">Full-car CFD cases, 26 to fit and 8 held out</span></div>
+          <div class="fig"><span class="val">120</span><span class="cap">Coupled cell equations, integrated with RK4</span></div>
+          <div class="fig"><span class="val">8</span><span class="cap">pytest tests, with a JUnit report</span></div>
+          <div class="fig"><span class="val">7–12&nbsp;K</span><span class="cap">Peak under-prediction by the lumped model it replaces</span></div>
+        </div>
+
+        <p class="scope">Scope: this was an individual university project built on Monash
+          Motorsport’s full-car CFD pipeline, which is the team’s work. The sweep design,
+          extraction, thermal model, verification and report are mine. I wrote the thermal
+          model modules myself; the surrogate and top-level model modules were drafted with AI
+          assistance and adapted by me. The full declaration is in the repository’s AI use
+          log.</p>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="row">
+    <h2 class="rowlabel">Next</h2>
+    <div>
+      <a class="projlink noimg" href="project-accumulator-cooling.html">
+        <div>
+          <span class="num">02</span>
+          <h3>Accumulator Cooling: Ducting Design and CFD</h3>
+          <p>The ducting this model was built to assess, and the 94 design runs behind it.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script src="theme.js" defer></script>
+<script src="lightbox.js" defer></script>
+<script src="reveal.js" defer></script>
+</body>
+</html>

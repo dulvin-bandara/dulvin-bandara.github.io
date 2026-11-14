@@ -6,10 +6,15 @@
 <title>Accumulator Cooling: Ducting Design and CFD — Dulvin Bandara</title>
 <meta name="description" content="External sidepod ducting and the internal flow path for the M26 accumulator. 0.768 CLA recovered across the design iteration, with accumulator mass flow raised from 0.008 to 0.021 kg/s.">
 
+<meta name="theme-color" content="#FAF9F6">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+
 <script>
-(function(){try{var s=localStorage.getItem('theme');
-document.documentElement.setAttribute('data-theme',
-s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+(function(){try{var d=document.documentElement,s=localStorage.getItem('theme'),
+t=s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+d.setAttribute('data-theme',t);
+var m=document.querySelector('meta[name="theme-color"]');
+if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'#FAF9F6'));
 }catch(e){}})();
 </script>
 
@@ -19,7 +24,6 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 <link rel="stylesheet" href="style.css">
 <link rel="canonical" href="https://dulvinbandara.com/project-accumulator-cooling.html">
 <meta name="author" content="Dulvin Bandara">
-<meta name="theme-color" content="#FAF9F6">
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Dulvin Bandara">
@@ -39,9 +43,11 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 </head>
 <body>
 
-<nav class="sitenav">
+<a class="skiplink" href="#main">Skip to Content</a>
+
+<nav class="sitenav" aria-label="Primary">
   <a href="index.html"><span class="num">01</span>Index</a>
-  <a href="projects.html" aria-current="page"><span class="num">02</span>Projects</a>
+  <a href="projects.html" aria-current="page"><span class="num">03</span>Projects</a>
   <a href="resume.html"><span class="num">03</span>Resume</a>
   <button class="themetoggle" type="button" aria-label="Switch theme">
     <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -49,9 +55,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
   </button>
 </nav>
 
-<div class="sheet">
+<main class="sheet" id="main">
 
-<a class="backlink" href="projects.html">← All projects</a>
+<a class="backlink" href="projects.html"><span class="arrow" aria-hidden="true">←</span>All Projects</a>
 
 <header class="masthead">
   <h1>Accumulator<br>Cooling</h1>
@@ -67,36 +73,36 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
 <section id="accumulator-cooling">
   <div class="row">
-    <div class="rowlabel">Project 01</div>
+    <h2 class="rowlabel">Project 02</h2>
     <div>
       <div class="entry">
 
         <div class="gallery" data-interval="5000">
           <div class="gstage">
             <figure class="gslide">
-              <img src="images/gallery/Project1/externalduct.webp" alt="Sidepod external duct geometry in NX">
+              <img src="images/gallery/Project1/externalduct.webp" alt="Sidepod external duct geometry in NX" width="1800" height="850" decoding="async">
               <figcaption>External sidepod duct, inspired by ground-effect era F1 sidepods.</figcaption>
             </figure>
             <figure class="gslide">
-              <img src="images/gallery/Project1/internalducts.webp" alt="Internal Ducting from Monocoque to Akku and Akku to Rear Bulkhead in NX">
+              <img src="images/gallery/Project1/internalducts.webp" alt="Internal Ducting from Monocoque to Akku and Akku to Rear Bulkhead in NX" width="1800" height="844" loading="lazy" decoding="async">
               <figcaption>Internal ducting from monocoque to accumulator and accumulator to rear bulkhead.</figcaption>
             </figure>
             <figure class="gslide">
-              <img src="images/gallery/Project1/cptx.webp" alt="Coefficient of Total Pressure X-Slice through the reverse duct and into the accumulator">
+              <img src="images/gallery/Project1/cptx.webp" alt="Coefficient of Total Pressure X-Slice through the reverse duct and into the accumulator" width="790" height="577" loading="lazy" decoding="async">
               <figcaption>Coefficient of Total Pressure X-Slice through the reverse duct and into the accumulator.</figcaption>
             </figure>
             <figure class="gslide">
-              <img src="images/gallery/Project1/cpty.webp" alt="Coefficient of Total Pressure Y-Slice through the reverse duct and into the accumulator">
+              <img src="images/gallery/Project1/cpty.webp" alt="Coefficient of Total Pressure Y-Slice through the reverse duct and into the accumulator" width="707" height="290" loading="lazy" decoding="async">
               <figcaption>Coefficient of Total Pressure Y-Slice through the reverse duct and into the accumulator.</figcaption>
             </figure>
             <figure class="gslide">
-              <img src="images/gallery/Project1/velakkucontour.webp" alt="Y-Velocity contour through the accumulator">
+              <img src="images/gallery/Project1/velakkucontour.webp" alt="Y-Velocity contour through the accumulator" width="437" height="812" loading="lazy" decoding="async">
               <figcaption>Y-Velocity contour through the accumulator.</figcaption>
             </figure>
           </div>
         </div>
 
-        <h3>Why are we Cooling?</h3>
+        <h3>Why Are We Cooling?</h3>
 
         <p>
           The M26 accumulator for the 2026 Monash Motorsport car is a 120s1p, 6.38&nbsp;kWh
@@ -110,7 +116,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
         <p>
           Cooling exists so the pack is able to run a full endurance duty cycle at a reduced
           capacity. PACSIM simulations showed a 4.8&nbsp;kWh pack is able to match the endurance
-          performance of a 9.4kg heavier uncooled pack. Following 2026 points sensitivities,
+          performance of a 9.4&nbsp;kg heavier uncooled pack. Following 2026 points sensitivities,
           it was estimated that a reduction in mass by 9.4&nbsp;kg provided a competition points
           gain of 20.57, a high sensitivity parameter vital for overall car performance.
         </p>
@@ -126,7 +132,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
         </p>
 
         <p>
-          Following more targeted design iterations, a &ldquo;sidepod&rdquo; esque external duct was
+          Following more targeted design iterations, a &ldquo;sidepod&rdquo;-esque external duct was
           investigated, inspired by the ground-effect era Formula 1 cars. This proved to be a
           vital stepping stone in solving the CLA drop, pushing it to an overall 5.174, from a
           costly 4.406 in the sealed duct case. The aerodynamic balance of the car also shifted
@@ -150,7 +156,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
         <figure class="plate">
           <img src="images/inletlength.webp"
-               alt="Monocoque inlet mass flow against inlet length">
+               alt="Monocoque inlet mass flow against inlet length" width="600" height="371" loading="lazy" decoding="async">
           <figcaption>Monocoque inlet mass flow against streamwise inlet position.</figcaption>
         </figure>
 
@@ -159,19 +165,19 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
           accumulator. To account for this 2 options were looked into, a waterproof mesh and
           louvres. Physically speaking if there was no airflow impact the waterproof mesh was
           the most viable option. Ordering a waterproof mesh and conducting some tests in an
-          wind-tunnel esque set-up below showed to block approximately 85-90% of the airflow,
+          wind-tunnel esque set-up below showed to block approximately 85–90% of the airflow,
           proving the mesh to be infeasible.
         </p>
 
         <figure class="plate">
           <img src="images/meshmockup.webp"
-               alt="Bench set-up used to measure airflow blockage through the waterproof mesh">
+               alt="Bench set-up used to measure airflow blockage through the waterproof mesh" width="1491" height="903" loading="lazy" decoding="async">
           <figcaption>Bench set-up used to measure flow blockage through the waterproof mesh. Measured blockage of 85–90% ruled the mesh out.</figcaption>
         </figure>
 
         <p>
           The louvres were looked at from then onwards at the bottom of the sidepod design.
-          Taking 3 louvres with dimensions 50mm x 100mm. Provided the best water pathway per
+          Taking 3 louvres with dimensions 50&nbsp;mm × 100&nbsp;mm. Provided the best water pathway per
           preliminary testing. During investigation of the louvres, a sweep of various angles
           with reference to the original positioning was conducted, unfortunately during the
           sweep the 12 degree angled louvre failed during the mesh process. However the following
@@ -184,15 +190,15 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
         <div class="plaperow">
           <figure class="plate">
-            <img src="images/coqueinlet.webp" alt="Monocoque inlet mass flow against louvre angle">
+            <img src="images/coqueinlet.webp" alt="Monocoque inlet mass flow against louvre angle" width="600" height="371" loading="lazy" decoding="async">
             <figcaption>Monocoque inlet mass flow against louvre angle.</figcaption>
           </figure>
           <figure class="plate">
-            <img src="images/clatotal.webp" alt="Total CLA against louvre angle">
+            <img src="images/clatotal.webp" alt="Total CLA against louvre angle" width="600" height="371" loading="lazy" decoding="async">
             <figcaption>Total CLA against louvre angle.</figcaption>
           </figure>
           <figure class="plate">
-            <img src="images/clacomp.webp" alt="Component CLA against louvre angle">
+            <img src="images/clacomp.webp" alt="Component CLA against louvre angle" width="600" height="371" loading="lazy" decoding="async">
             <figcaption>Component CLA against louvre angle. 12&deg; failed to mesh and is omitted.</figcaption>
           </figure>
         </div>
@@ -211,7 +217,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
           maximising the mass flow of air entering the accumulator and the overall uniformity of
           the velocity. Why? The mass flow is a key indicator of the volume of air being pushed
           through; the higher the mass flow, the greater the heat rejection available, bounded by
-          what the fan can deliver. The uniformity is a scale from 0-1 showing how the velocity
+          what the fan can deliver. The uniformity is a scale from 0–1 showing how the velocity
           varies over a surface, with a value of 1 indicating perfectly uniform velocity over a
           surface, with lower values increasing the variation in velocity, using an area-weighted
           uniformity. By comparing these 2 metrics from the monocoque internal hole to the
@@ -257,7 +263,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
           and a velocity uniformity of 0.943. Furthermore, the CLA had increased by 0.768, with
           the centre of pressure of the car moving from 48.8% to 50% from initial cooling runs.
           Current work focuses on manufacturing the ducts and finalising the thermal values, a
-          direct measure of the work.
+          direct measure of the work. The
+          <a href="project-thermal-surrogate.html">surrogate thermal model</a> picks that
+          question up, predicting cell temperatures across speed and ride height.
         </p>
 
         <div class="figures">
@@ -280,12 +288,12 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
 <section>
   <div class="row">
-    <div class="rowlabel">Next</div>
+    <h2 class="rowlabel">Next</h2>
     <div>
       <a class="projlink noimg" href="project-cfd-workflow.html">
         <div>
-          <span class="num">02</span>
-          <h3>Building Cooling into the CFD workflow</h3>
+          <span class="num">03</span>
+          <h3>Building Cooling Into the CFD Workflow</h3>
           <p>The workflow this project depended on, and the three attempts it took to get
             a fan boundary condition to define at all.</p>
         </div>
@@ -294,7 +302,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
   </div>
 </section>
 
-</div>
+</main>
 
 <script src="theme.js" defer></script>
 <script src="gallery.js" defer></script>

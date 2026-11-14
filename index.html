@@ -4,12 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dulvin Bandara — Aerodynamics &amp; Thermal CFD</title>
-<meta name="description" content="Aerodynamics and thermal cooling CFD at Monash Motorsport. Simulation workflows, ducting design and internal flow management for Formula Student.">
+<meta name="description" content="Aerodynamics and thermal cooling CFD at Monash Motorsport. Python simulation tooling, machine-learning surrogates, ducting design and internal flow management for Formula Student.">
+
+<meta name="theme-color" content="#F1EFEA" data-light="#F1EFEA" data-dark="#07080A">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 
 <script>
-(function(){try{var s=localStorage.getItem('theme');
-document.documentElement.setAttribute('data-theme',
-s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+(function(){try{var d=document.documentElement,s=localStorage.getItem('theme'),
+t=s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+d.setAttribute('data-theme',t);
+var m=document.querySelector('meta[name="theme-color"]');
+if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'#FAF9F6'));
 }catch(e){}})();
 </script>
 
@@ -19,7 +24,6 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 <link rel="stylesheet" href="style.css">
 <link rel="canonical" href="https://dulvinbandara.com/">
 <meta name="author" content="Dulvin Bandara">
-<meta name="theme-color" content="#07080A">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Dulvin Bandara">
@@ -39,7 +43,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 </head>
 <body>
 
-<nav class="sitenav">
+<a class="skiplink" href="#main">Skip to Content</a>
+
+<nav class="sitenav" aria-label="Primary">
   <a href="index.html" aria-current="page"><span class="num">01</span>Index</a>
   <a href="projects.html"><span class="num">02</span>Projects</a>
   <a href="resume.html"><span class="num">03</span>Resume</a>
@@ -49,72 +55,77 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
   </button>
 </nav>
 
-<div class="sheet">
+<main class="sheet" id="main">
 
 <div class="hero" data-wall="collage">
 
 <header class="masthead">
-  <h1>Dulvin Bandara.</h1>
+  <h1 translate="no">Dulvin Bandara.</h1>
   <p class="role">Aerodynamics and thermal cooling CFD at Monash Motorsport. Building
     simulation workflows and physical cooling mechanisms for Formula Student cars, with
     a focus on internal flow management. Moving towards aero-thermal integration in
     motorsport.</p>
   <div class="contact">
-    <span>dulvinb@gmail.com</span>
+    <span><a href="mailto:dulvinb@gmail.com">dulvinb@gmail.com</a></span>
     <span><a href="https://www.linkedin.com/in/dulvin-bandara-8b485725a/" target="_blank" rel="noopener">LinkedIn</a></span>
     <span>Melbourne, Australia</span>
   </div>
 </header>
 
+  <button class="heropause" type="button" aria-label="Pause background motion" aria-pressed="false">
+    <svg class="i-pause" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><rect x="2" y="1.5" width="3" height="9"/><rect x="7" y="1.5" width="3" height="9"/></svg>
+    <svg class="i-play" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M2.5 1.5v9l8-4.5z"/></svg>
+  </button>
+
   <div class="pw">
     <div class="pw-track">
         <figure class="pw-item pw-a">
-          <img src="images/gallery/Project3/day1setup.webp" alt="Day 1 setup in the wind tunnel with the 2025 car and false floor" decoding="async" fetchpriority="high">
+          <img src="images/gallery/Project3/day1setup.webp" alt="Day 1 setup in the wind tunnel with the 2025 car and false floor" decoding="async" fetchpriority="high" width="1800" height="1350">
         </figure>
         <figure class="pw-item pw-b">
-          <img src="images/gallery/Project3/rearwingonly.webp" alt="Rear wing only test configuration in the wind tunnel" decoding="async" fetchpriority="high">
+          <img src="images/gallery/Project3/rearwingonly.webp" alt="Rear wing only test configuration in the wind tunnel" decoding="async" fetchpriority="high" width="1800" height="1350">
         </figure>
         <figure class="pw-item pw-c">
-          <img src="images/gallery/Project3/anotheranglerake.webp" alt="Measuring rake behind the side diffuser, second angle" decoding="async" fetchpriority="high">
+          <img src="images/gallery/Project3/anotheranglerake.webp" alt="Measuring rake behind the side diffuser, second angle" decoding="async" fetchpriority="high" width="1800" height="1350">
         </figure>
         <figure class="pw-item pw-f">
-          <img src="images/fluentcontour.webp" alt="Fluent contour of the accumulator cooling ducting" decoding="async" loading="lazy">
+          <img src="images/fluentcontour.webp" alt="Fluent contour of the accumulator cooling ducting" decoding="async" loading="lazy" width="1800" height="627">
         </figure>
         <figure class="pw-item pw-e">
-          <img src="images/gallery/Project3/measuringrake.webp" alt="Measuring rake behind the side diffuser in the wind tunnel" decoding="async" loading="lazy">
+          <img src="images/gallery/Project3/measuringrake.webp" alt="Measuring rake behind the side diffuser in the wind tunnel" decoding="async" loading="lazy" width="1800" height="1350">
         </figure>
         <figure class="pw-item pw-d">
-          <img src="images/tappedwing.webp" alt="Tapped rear wing bottom skin" decoding="async" loading="lazy">
+          <img src="images/tappedwing.webp" alt="Tapped rear wing bottom skin" decoding="async" loading="lazy" width="521" height="295">
         </figure>
         <figure class="pw-item pw-g">
-          <img src="images/gallery/Project3/teamphoto.webp" alt="Team photo at the Australian Centre for Sports Aerodynamics in Adelaide" decoding="async" loading="lazy">
+          <img src="images/gallery/Project3/teamphoto.webp" alt="Team photo at the Australian Centre for Sports Aerodynamics in Adelaide" decoding="async" loading="lazy" width="1800" height="734">
         </figure>
         <figure class="pw-item pw-h">
-          <img src="images/closedwheels.webp" alt="Closed wheels configuration in the wind tunnel" decoding="async" loading="lazy">
+          <img src="images/closedwheels.webp" alt="Closed wheels configuration in the wind tunnel" decoding="async" loading="lazy" width="529" height="328">
         </figure>
         <figure class="pw-item pw-a pw-dup" aria-hidden="true">
-          <img src="images/gallery/Project3/day1setup.webp" alt="" decoding="async">
+          <img src="images/gallery/Project3/day1setup.webp" alt="" decoding="async" width="1800" height="1350" loading="lazy">
         </figure>
         <figure class="pw-item pw-b pw-dup" aria-hidden="true">
-          <img src="images/gallery/Project3/rearwingonly.webp" alt="" decoding="async">
+          <img src="images/gallery/Project3/rearwingonly.webp" alt="" decoding="async" width="1800" height="1350" loading="lazy">
         </figure>
         <figure class="pw-item pw-c pw-dup" aria-hidden="true">
-          <img src="images/gallery/Project3/anotheranglerake.webp" alt="" decoding="async">
+          <img src="images/gallery/Project3/anotheranglerake.webp" alt="" decoding="async" width="1800" height="1350" loading="lazy">
         </figure>
         <figure class="pw-item pw-f pw-dup" aria-hidden="true">
-          <img src="images/fluentcontour.webp" alt="" decoding="async">
+          <img src="images/fluentcontour.webp" alt="" decoding="async" width="1800" height="627" loading="lazy">
         </figure>
         <figure class="pw-item pw-e pw-dup" aria-hidden="true">
-          <img src="images/gallery/Project3/measuringrake.webp" alt="" decoding="async">
+          <img src="images/gallery/Project3/measuringrake.webp" alt="" decoding="async" width="1800" height="1350" loading="lazy">
         </figure>
         <figure class="pw-item pw-d pw-dup" aria-hidden="true">
-          <img src="images/tappedwing.webp" alt="" decoding="async">
+          <img src="images/tappedwing.webp" alt="" decoding="async" width="521" height="295" loading="lazy">
         </figure>
         <figure class="pw-item pw-g pw-dup" aria-hidden="true">
-          <img src="images/gallery/Project3/teamphoto.webp" alt="" decoding="async">
+          <img src="images/gallery/Project3/teamphoto.webp" alt="" decoding="async" width="1800" height="734" loading="lazy">
         </figure>
         <figure class="pw-item pw-h pw-dup" aria-hidden="true">
-          <img src="images/closedwheels.webp" alt="" decoding="async">
+          <img src="images/closedwheels.webp" alt="" decoding="async" width="529" height="328" loading="lazy">
         </figure>
     </div>
   </div>
@@ -124,7 +135,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 <!-- ================= FOCUS ================= -->
 <section>
   <div class="row">
-    <div class="rowlabel">Focus</div>
+    <h2 class="rowlabel">Focus</h2>
     <div>
       <p>Within Monash Motorsport I work primarily on the simulation side of the
         Aerodynamics and Cooling subsections — building the CFD pipeline, setting up
@@ -133,9 +144,14 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
         workflows on HPC that cut the manual setup time each simulation campaign
         demands.</p>
       <p>I also work the design side of cooling, building ducting and packaging in
-        Siemens NX and integrating the cooling system into the car's overall
+        Siemens NX and integrating the cooling system into the car’s overall
         architecture. That work currently covers accumulator cooling, with the pipeline
         set up to extend into motor and inverter cooling.</p>
+      <p>Increasingly that work is software. I write Python tooling around the
+        simulations: the cooling workflow in the team’s PyFluent pipeline, unit tests that
+        catch failures before a case reaches the cluster, and most recently a
+        machine-learning surrogate that predicts cooling mass flow from 34 full-car CFD
+        cases and drives a transient thermal model of the accumulator.</p>
       <p>Away from the team I shoot and edit film and photography, marshal for Motorsport
         Australia, and teach a co-curricular Aerospace Engineering course to Year 10 and
         11 students at John Monash Science School.</p>
@@ -146,14 +162,29 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 <!-- ================= WORK ================= -->
 <section>
   <div class="row">
-    <div class="rowlabel">Selected work</div>
+    <h2 class="rowlabel">Selected Work</h2>
     <div>
+
+      <a class="projlink" href="project-thermal-surrogate.html">
+        <img class="thumb" src="images/gallery/Project4/massFlow.png"
+             alt="Surrogate-predicted cooling mass flow against vehicle velocity, with CFD training and held-out points" width="1109" height="812" loading="lazy" decoding="async">
+        <div>
+          <span class="num">01</span>
+          <h3>Surrogate Thermal Model: Gaussian Process and Transient Network</h3>
+          <p>A machine-learning surrogate trained on 34 full-car CFD cases, feeding a
+            120-cell thermal network in Python. Held-out R² of 0.9932.</p>
+          <div class="projmeta">
+            <span class="tag">Software</span>
+            <span translate="no">Python</span><span translate="no">scikit-learn</span><span translate="no">pytest</span><span>2026</span>
+          </div>
+        </div>
+      </a>
 
       <a class="projlink" href="project-accumulator-cooling.html">
         <img class="thumb" src="images/ducts.webp"
-             alt="Isometric View of the Accumulator Cooling Ducting">
+             alt="Isometric view of the accumulator cooling ducting" width="1172" height="742" loading="lazy" decoding="async">
         <div>
-          <span class="num">01</span>
+          <span class="num">02</span>
           <h3>Accumulator Cooling: Ducting Design and CFD</h3>
           <p>External sidepod ducting and an internal flow path for the M26 pack.
             0.768&nbsp;CLA recovered across the design iteration, balance on 50.0%.</p>
@@ -166,10 +197,10 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
       <a class="projlink" href="project-cfd-workflow.html">
         <img class="thumb" src="images/velcoquecontour.webp"
-             alt="Velocity Contour into the monocoque">
+             alt="Velocity contour into the monocoque" width="888" height="812" loading="lazy" decoding="async">
         <div>
-          <span class="num">02</span>
-          <h3>Building Cooling into the CFD workflow</h3>
+          <span class="num">03</span>
+          <h3>Building Cooling Into the CFD Workflow</h3>
           <p>Fan boundary conditions, thermal simulation and accumulator ducting added
             to a workflow that had none, then carried into PyFluent on HPC.</p>
           <div class="projmeta">
@@ -181,9 +212,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
       <a class="projlink" href="project-wind-tunnel.html">
         <img class="thumb" src="images/acsa.webp"
-             alt="CFD Validation Results">
+             alt="CFD validation results from the wind tunnel campaign" width="1581" height="812" loading="lazy" decoding="async">
         <div>
-          <span class="num">03</span>
+          <span class="num">04</span>
           <h3>Australian Centre for Sports Aerodynamics: CFD Validation</h3>
           <p>A week correlating our CFD against tunnel data on two cars. Lift
             discrepancy cut from 23% to roughly 10%.</p>
@@ -199,9 +230,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
       <a class="projlink" href="project-film.html">
         <img class="thumb" src="images/film/cover.jpg"
-             alt="Still frame from recent camcorder footage">
+             alt="Still frame from recent camcorder footage" loading="lazy" decoding="async">
         <div>
-          <span class="num">04</span>
+          <span class="num">05</span>
           <h3>Film &amp; Photography</h3>
           <p>A vintage camcorder, a DJI drone and a phone. The counterweight to a year
             spent looking at residual plots.</p>
@@ -221,7 +252,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 <!-- ================= EDUCATION ================= -->
 <section>
   <div class="row">
-    <div class="rowlabel">Education</div>
+    <h2 class="rowlabel">Education</h2>
     <div>
       <div class="entry">
         <h3>Monash University</h3>
@@ -239,7 +270,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
   </div>
 </section>
 
-</div>
+</main>
 
 <script src="theme.js" defer></script>
 <script src="reveal.js" defer></script>
