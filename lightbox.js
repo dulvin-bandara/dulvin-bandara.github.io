@@ -1,19 +1,22 @@
 /* ============================================================
    Image lightbox
-   Auto-binds to every <img> inside a .plate figure.
-   No markup changes needed. Uses native <dialog> so Esc
-   and focus trapping come for free.
+   Auto-binds to every <img> inside a .plate or .gslide figure.
+   No markup changes needed: each image is wrapped in a real
+   <button>, so keyboard and screen-reader support are native.
+   Uses <dialog> so Esc, focus trapping and focus return come
+   for free.
    ============================================================ */
 
 (function () {
-  var figures = document.querySelectorAll('.plate img, .gslide img');
-  if (!figures.length || !window.HTMLDialogElement) return;
+  var images = document.querySelectorAll('.plate img, .gslide img');
+  if (!images.length || !window.HTMLDialogElement) return;
 
   // build the dialog once
   var dlg = document.createElement('dialog');
   dlg.className = 'lightbox';
+  dlg.setAttribute('aria-label', 'Enlarged image');
   dlg.innerHTML =
-    '<button class="lightbox-close" aria-label="Close image">&times;</button>' +
+    '<button class="lightbox-close" type="button" aria-label="Close image">&times;</button>' +
     '<figure class="lightbox-inner">' +
       '<img alt="">' +
       '<figcaption></figcaption>' +
@@ -40,24 +43,23 @@
     dlg.showModal();
   }
 
-  Array.prototype.forEach.call(figures, function (img) {
-    img.tabIndex = 0;
-    img.setAttribute('role', 'button');
-    img.setAttribute('aria-label', 'Expand image');
-    img.addEventListener('click', function () { open(img); });
-    img.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        open(img);
-      }
-    });
+  Array.prototype.forEach.call(images, function (img) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'zoom';
+    // the image's alt text stays the button's name; this adds what it does
+    btn.title = 'Expand image';
+    img.parentNode.insertBefore(btn, img);
+    btn.appendChild(img);
+    btn.addEventListener('click', function () { open(img); });
   });
 
   closeBtn.addEventListener('click', function () { dlg.close(); });
 
-  // click on the backdrop area (the dialog itself, not its contents)
+  // click on the backdrop area (the dialog itself, not its contents),
+  // or on the enlarged image, which shows a zoom-out cursor
   dlg.addEventListener('click', function (e) {
-    if (e.target === dlg) dlg.close();
+    if (e.target === dlg || e.target === lbImg) dlg.close();
   });
 
   // release the image so a large file isn't held in memory

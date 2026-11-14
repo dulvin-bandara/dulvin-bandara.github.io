@@ -6,10 +6,15 @@
 <title>Resume — Dulvin Bandara</title>
 <meta name="description" content="CV for Dulvin Bandara — aerodynamics, cooling and CFD workflow development at Monash Motorsport.">
 
+<meta name="theme-color" content="#FAF9F6">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+
 <script>
-(function(){try{var s=localStorage.getItem('theme');
-document.documentElement.setAttribute('data-theme',
-s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+(function(){try{var d=document.documentElement,s=localStorage.getItem('theme'),
+t=s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+d.setAttribute('data-theme',t);
+var m=document.querySelector('meta[name="theme-color"]');
+if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'#FAF9F6'));
 }catch(e){}})();
 </script>
 
@@ -19,7 +24,6 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 <link rel="stylesheet" href="style.css">
 <link rel="canonical" href="https://dulvinbandara.com/resume.html">
 <meta name="author" content="Dulvin Bandara">
-<meta name="theme-color" content="#FAF9F6">
 
 <meta property="og:type" content="profile">
 <meta property="og:site_name" content="Dulvin Bandara">
@@ -69,7 +73,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 </head>
 <body>
 
-<nav class="sitenav">
+<a class="skiplink" href="#main">Skip to Content</a>
+
+<nav class="sitenav" aria-label="Primary">
   <a href="index.html"><span class="num">01</span>Index</a>
   <a href="projects.html"><span class="num">02</span>Projects</a>
   <a href="resume.html" aria-current="page"><span class="num">03</span>Resume</a>
@@ -79,21 +85,21 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
   </button>
 </nav>
 
-<div class="sheet">
+<main class="sheet" id="main">
 
 <header class="masthead">
   <h1>Resume</h1>
   <p class="role">Aerodynamics, cooling and CFD workflow development at Monash Motorsport.</p>
   <div class="contact">
     <span>Dulvin Bandara</span>
-    <span>dulvinb@gmail.com</span>
+    <span><a href="mailto:dulvinb@gmail.com">dulvinb@gmail.com</a></span>
     <span><a href="https://www.linkedin.com/in/dulvin-bandara-8b485725a/" target="_blank" rel="noopener">LinkedIn</a></span>
   </div>
 </header>
 
 <section>
   <div class="row">
-    <div class="rowlabel">Curriculum Vitae</div>
+    <h2 class="rowlabel">Curriculum Vitae</h2>
     <div>
       <iframe class="cvframe"
               src="DulvinBandaraCV.pdf#toolbar=0&amp;navpanes=0&amp;view=FitH"
@@ -109,7 +115,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
   </div>
 </section>
 
-</div>
+</main>
 
 <script src="theme.js" defer></script>
 <script src="reveal.js" defer></script>

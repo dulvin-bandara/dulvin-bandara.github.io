@@ -6,10 +6,15 @@
 <title>Australian Centre for Sports Aerodynamics: CFD Validation — Dulvin Bandara</title>
 <meta name="description" content="A week at the Australian Centre for Sports Aerodynamics correlating Monash Motorsport CFD against tunnel data on two cars. Lift discrepancy cut from 23% to roughly 10%.">
 
+<meta name="theme-color" content="#FAF9F6">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+
 <script>
-(function(){try{var s=localStorage.getItem('theme');
-document.documentElement.setAttribute('data-theme',
-s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+(function(){try{var d=document.documentElement,s=localStorage.getItem('theme'),
+t=s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+d.setAttribute('data-theme',t);
+var m=document.querySelector('meta[name="theme-color"]');
+if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'#FAF9F6'));
 }catch(e){}})();
 </script>
 
@@ -19,7 +24,6 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 <link rel="stylesheet" href="style.css">
 <link rel="canonical" href="https://dulvinbandara.com/project-wind-tunnel.html">
 <meta name="author" content="Dulvin Bandara">
-<meta name="theme-color" content="#FAF9F6">
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Dulvin Bandara">
@@ -37,7 +41,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 </head>
 <body>
 
-<nav class="sitenav">
+<a class="skiplink" href="#main">Skip to Content</a>
+
+<nav class="sitenav" aria-label="Primary">
   <a href="index.html"><span class="num">01</span>Index</a>
   <a href="projects.html" aria-current="page"><span class="num">02</span>Projects</a>
   <a href="resume.html"><span class="num">03</span>Resume</a>
@@ -47,9 +53,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
   </button>
 </nav>
 
-<div class="sheet">
+<main class="sheet" id="main">
 
-<a class="backlink" href="projects.html">← All projects</a>
+<a class="backlink" href="projects.html"><span class="arrow" aria-hidden="true">←</span>All Projects</a>
 
 <header class="masthead">
   <h1>ACSA<br>CFD Validation</h1>
@@ -65,30 +71,30 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
 <section id="wind-tunnel">
   <div class="row">
-    <div class="rowlabel">Project 03</div>
+    <h2 class="rowlabel">Project 04</h2>
     <div>
       <div class="entry">
 
         <div class="gallery" data-interval="5000">
           <div class="gstage">
             <figure class="gslide">
-              <img src="images/gallery/Project3/teamphoto.webp" alt="Team Photo at the Australian Centre for Sports Aerodynamics in Adelaide">
+              <img src="images/gallery/Project3/teamphoto.webp" alt="Team Photo at the Australian Centre for Sports Aerodynamics in Adelaide" width="1800" height="734" decoding="async">
               <figcaption>Team Photo at the Australian Centre for Sports Aerodynamics in Adelaide.</figcaption>
             </figure>
             <figure class="gslide">
-              <img src="images/gallery/Project3/rearwingonly.webp" alt="Rear Wing Only Test Configuration in the Wind Tunnel">
+              <img src="images/gallery/Project3/rearwingonly.webp" alt="Rear Wing Only Test Configuration in the Wind Tunnel" width="1800" height="1350" loading="lazy" decoding="async">
               <figcaption>Rear Wing Only Test Configuration in the Wind Tunnel.</figcaption>
             </figure>
             <figure class="gslide">
-              <img src="images/gallery/Project3/measuringrake.webp" alt="Measuring Rake behind the Side Diffuser in the Wind Tunnel">
+              <img src="images/gallery/Project3/measuringrake.webp" alt="Measuring Rake behind the Side Diffuser in the Wind Tunnel" width="1800" height="1350" loading="lazy" decoding="async">
               <figcaption>Measuring Rake behind the Side Diffuser in the Wind Tunnel.</figcaption>
             </figure>
             <figure class="gslide">
-              <img src="images/gallery/Project3/anotheranglerake.webp" alt="Angle Angle Rake behind the Side Diffuser in the Wind Tunnel">
-              <figcaption>Angle Angle Rake behind the Side Diffuser in the Wind Tunnel.</figcaption>
+              <img src="images/gallery/Project3/anotheranglerake.webp" alt="Second Angle of the Rake Behind the Side Diffuser in the Wind Tunnel" width="1800" height="1350" loading="lazy" decoding="async">
+              <figcaption>Second Angle of the Rake Behind the Side Diffuser in the Wind Tunnel.</figcaption>
             </figure>
             <figure class="gslide">
-              <img src="images/gallery/Project3/day1setup.webp" alt="Day 1 Setup in the Wind Tunnel with the 2025 Car and False Floor">
+              <img src="images/gallery/Project3/day1setup.webp" alt="Day 1 Setup in the Wind Tunnel with the 2025 Car and False Floor" width="1800" height="1350" loading="lazy" decoding="async">
               <figcaption>Day 1 Setup in the Wind Tunnel with the 2025 Car and False Floor.</figcaption>
             </figure>
           </div>
@@ -122,7 +128,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
         </p>
 
         <figure class="plate">
-          <img src="images/tappedwing.webp" alt="Tapped Rear Wing Bottom Skin">
+          <img src="images/tappedwing.webp" alt="Tapped Rear Wing Bottom Skin" width="521" height="295" loading="lazy" decoding="async">
           <figcaption>Tapped Rear Wing Bottom Skin.</figcaption>
         </figure>
 
@@ -138,7 +144,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
         </p>
 
         <figure class="plate">
-          <img src="images/tufting.webp" alt="Tufting Locations over CpS plot">
+          <img src="images/tufting.webp" alt="Tufting Locations over CpS plot" width="1668" height="938" loading="lazy" decoding="async">
           <figcaption>Tufting Locations over CpS plot.</figcaption>
         </figure>
 
@@ -191,7 +197,7 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
 
         <figure class="plate">
-          <img src="images/closedwheels.webp" alt="Closed Wheels M25 Test Configuration in the Wind Tunnel">
+          <img src="images/closedwheels.webp" alt="Closed Wheels M25 Test Configuration in the Wind Tunnel" width="529" height="328" loading="lazy" decoding="async">
           <figcaption>Closed Wheels Configuration.</figcaption>
         </figure>
 
@@ -202,20 +208,21 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
 <section>
   <div class="row">
-    <div class="rowlabel">Next</div>
+    <h2 class="rowlabel">Next</h2>
     <div>
-      <a class="projlink noimg" href="project-accumulator-cooling.html">
+      <a class="projlink noimg" href="project-thermal-surrogate.html">
         <div>
           <span class="num">01</span>
-          <h3>Accumulator Cooling: Ducting Design and CFD</h3>
-          <p>External sidepod ducting and the internal flow path for the M26 pack.</p>
+          <h3>Surrogate Thermal Model: Gaussian Process and Transient Network</h3>
+          <p>A Gaussian process trained on full-car CFD, feeding a transient thermal network
+            of the M26 pack.</p>
         </div>
       </a>
     </div>
   </div>
 </section>
 
-</div>
+</main>
 
 <script src="theme.js" defer></script>
 <script src="gallery.js" defer></script>

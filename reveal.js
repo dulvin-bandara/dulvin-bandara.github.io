@@ -37,13 +37,17 @@
 
   // Anything already in view on load reveals immediately, without waiting
   // for a scroll event.
+  // Measure everything first, then write, so the browser lays out once
+  // instead of once per element.
   window.addEventListener('load', function () {
-    Array.prototype.forEach.call(targets, function (el) {
+    var vh = window.innerHeight;
+    var inView = Array.prototype.filter.call(targets, function (el) {
       var r = el.getBoundingClientRect();
-      if (r.top < window.innerHeight && r.bottom > 0) {
-        el.classList.add('is-visible');
-        io.unobserve(el);
-      }
+      return r.top < vh && r.bottom > 0;
+    });
+    inView.forEach(function (el) {
+      el.classList.add('is-visible');
+      io.unobserve(el);
     });
   });
 })();

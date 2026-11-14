@@ -4,12 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Projects — Dulvin Bandara</title>
-<meta name="description" content="Accumulator cooling ducting design and CFD, building the team's cooling CFD capability in PyFluent, and wind tunnel correlation at ACSA.">
+<meta name="description" content="A machine-learning surrogate thermal model in Python, accumulator cooling ducting design and CFD, building the team's cooling CFD capability in PyFluent, and wind tunnel correlation at ACSA.">
+
+<meta name="theme-color" content="#FAF9F6">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 
 <script>
-(function(){try{var s=localStorage.getItem('theme');
-document.documentElement.setAttribute('data-theme',
-s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+(function(){try{var d=document.documentElement,s=localStorage.getItem('theme'),
+t=s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+d.setAttribute('data-theme',t);
+var m=document.querySelector('meta[name="theme-color"]');
+if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'#FAF9F6'));
 }catch(e){}})();
 </script>
 
@@ -19,7 +24,6 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 <link rel="stylesheet" href="style.css">
 <link rel="canonical" href="https://dulvinbandara.com/projects.html">
 <meta name="author" content="Dulvin Bandara">
-<meta name="theme-color" content="#FAF9F6">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Dulvin Bandara">
@@ -39,7 +43,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 </head>
 <body>
 
-<nav class="sitenav">
+<a class="skiplink" href="#main">Skip to Content</a>
+
+<nav class="sitenav" aria-label="Primary">
   <a href="index.html"><span class="num">01</span>Index</a>
   <a href="projects.html" aria-current="page"><span class="num">02</span>Projects</a>
   <a href="resume.html"><span class="num">03</span>Resume</a>
@@ -49,28 +55,45 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
   </button>
 </nav>
 
-<div class="sheet">
+<main class="sheet" id="main">
 
 <header class="masthead">
   <h1>Projects</h1>
   <p class="role">Aerodynamics, cooling and CFD workflow development at Monash Motorsport.</p>
   <div class="contact">
     <span>Dulvin Bandara</span>
-    <span>dulvinb@gmail.com</span>
+    <span><a href="mailto:dulvinb@gmail.com">dulvinb@gmail.com</a></span>
     <span><a href="https://www.linkedin.com/in/dulvin-bandara-8b485725a/" target="_blank" rel="noopener">LinkedIn</a></span>
   </div>
 </header>
 
 <section>
   <div class="row">
-    <div class="rowlabel">Writeups</div>
+    <h2 class="rowlabel">Write-Ups</h2>
     <div>
+
+      <a class="projlink" href="project-thermal-surrogate.html">
+        <img class="thumb" src="images/gallery/Project4/massFlow.png"
+             alt="Surrogate-predicted cooling mass flow against vehicle velocity, with CFD training and held-out points" width="1109" height="812" decoding="async">
+        <div>
+          <span class="num">01</span>
+          <h3>Surrogate Thermal Model: Gaussian Process and Transient Network</h3>
+          <p>A Gaussian process trained on 34 full-car CFD cases predicts cooling mass flow
+            from vehicle attitude; a 120-cell transient network turns it into cell
+            temperatures. Held-out R² of 0.9932, fourth-order integration verified, tested
+            and documented.</p>
+          <div class="projmeta">
+            <span class="tag">Software</span>
+            <span translate="no">Python</span><span translate="no">scikit-learn</span><span translate="no">NumPy</span><span translate="no">pytest</span><span translate="no">pdoc</span><span>2026</span>
+          </div>
+        </div>
+      </a>
 
       <a class="projlink" href="project-accumulator-cooling.html">
         <img class="thumb" src="images/ducts.webp"
-             alt="Isometric View of the Accumulator Cooling Ducting">
+             alt="Isometric view of the accumulator cooling ducting" width="1172" height="742" loading="lazy" decoding="async">
         <div>
-          <span class="num">01</span>
+          <span class="num">02</span>
           <h3>Accumulator Cooling: Ducting Design and CFD</h3>
           <p>External sidepod ducting and an internal flow path for the M26 pack.
             0.768&nbsp;CLA recovered across the design iteration, balance on 50.0%, and
@@ -84,10 +107,10 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
       <a class="projlink" href="project-cfd-workflow.html">
         <img class="thumb" src="images/velcoquecontour.webp"
-             alt="Velocity Contour into the monocoque">
+             alt="Velocity Contour into the monocoque" width="888" height="812" loading="lazy" decoding="async">
         <div>
-          <span class="num">02</span>
-          <h3>Building Cooling into the CFD workflow</h3>
+          <span class="num">03</span>
+          <h3>Building Cooling Into the CFD Workflow</h3>
           <p>Fan boundary conditions, thermal simulation and accumulator ducting added to
             a workflow that had none, then carried into PyFluent on HPC with automated
             post-processing.</p>
@@ -100,9 +123,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
       <a class="projlink" href="project-wind-tunnel.html">
         <img class="thumb" src="images/acsa.webp"
-             alt="CFD Validation Results">
+             alt="CFD Validation Results" width="1581" height="812" loading="lazy" decoding="async">
         <div>
-          <span class="num">03</span>
+          <span class="num">04</span>
           <h3>Australian Centre for Sports Aerodynamics: CFD Validation</h3>
           <p>A week in Adelaide with two cars, validating our CFD and turbulence modelling
             against wind tunnel data.</p>
@@ -118,9 +141,9 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 
       <a class="projlink" href="project-film.html">
         <img class="thumb" src="images/film/cover.jpg"
-             alt="Still frame from recent camcorder footage">
+             alt="Still frame from recent camcorder footage" loading="lazy" decoding="async">
         <div>
-          <span class="num">04</span>
+          <span class="num">05</span>
           <h3>Film &amp; Photography</h3>
           <p>Shooting and editing on a vintage camcorder, a DJI drone and a phone. The
             counterweight to a year spent looking at residual plots.</p>
@@ -140,10 +163,14 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 <!-- ================= TOOLS ================= -->
 <section>
   <div class="row">
-    <div class="rowlabel">Tools</div>
+    <h2 class="rowlabel">Tools</h2>
     <div>
       <div class="skillgroup">
-        <h3>CFD and simulation</h3>
+        <h3>Software &amp; Data</h3>
+        <p translate="no">Python · NumPy · scikit-learn · Matplotlib · pytest · pdoc · Git · SLURM</p>
+      </div>
+      <div class="skillgroup">
+        <h3>CFD &amp; Simulation</h3>
         <p>Ansys Fluent 25R1 · PyFluent scripting · SLURM / HPC batch workflows · mesh generation and convergence · boundary condition derivation · MATLAB post-processing</p>
       </div>
       <div class="skillgroup">
@@ -151,14 +178,14 @@ s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
         <p>Conjugate heat transfer setup · duct and internal flow · fan curve and system curve matching · CFD-to-rig-test validation</p>
       </div>
       <div class="skillgroup">
-        <h3>Design and CAD</h3>
+        <h3>Design &amp; CAD</h3>
         <p>Siemens NX · duct and packaging geometry · Cooling system integration into vehicle architecture</p>
       </div>
     </div>
   </div>
 </section>
 
-</div>
+</main>
 
 <script src="theme.js" defer></script>
 <script src="reveal.js" defer></script>
