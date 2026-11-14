@@ -60,7 +60,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 <a class="backlink" href="projects.html"><span class="arrow" aria-hidden="true">←</span>All Projects</a>
 
 <header class="masthead">
-  <h1>Accumulator<br>Cooling</h1>
+  <h1>Accumulator <br>Cooling</h1>
   <p class="role">Ducting design and CFD for the M26 pack — cooling that pays back
     most of what it costs the floor.</p>
   <div class="contact">
@@ -73,9 +73,20 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 
 <section id="accumulator-cooling">
   <div class="row">
-    <h2 class="rowlabel">Project 02</h2>
+    <h2 class="rowlabel">Project 04</h2>
     <div>
       <div class="entry">
+
+        <div class="contrib">
+          <h3>My Contribution</h3>
+          <ul>
+            <li><strong>Duct design</strong> in Siemens NX: the external sidepod duct, and the internal path from monocoque to accumulator and out through the rear bulkhead.</li>
+            <li><strong>CFD setup and boundary conditions</strong> for the full-car cooling case, including the pressure-jump fans.</li>
+            <li><strong>Meshing and solver debugging</strong> across the design campaign.</li>
+          </ul>
+          <p class="meta">Not mine: thermal resistance modelling and the cooling-method trade study (electrical powertrain group) · mesh independence study (a peer) · Duct geometry withheld under team IP; the method is described in full</p>
+        </div>
+
 
         <div class="gallery" data-interval="5000">
           <div class="gstage">
@@ -290,12 +301,12 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
   <div class="row">
     <h2 class="rowlabel">Next</h2>
     <div>
-      <a class="projlink noimg" href="project-cfd-workflow.html">
+      <a class="projlink noimg" href="project-thermal-surrogate.html">
         <div>
-          <span class="num">03</span>
-          <h3>Building Cooling Into the CFD Workflow</h3>
-          <p>The workflow this project depended on, and the three attempts it took to get
-            a fan boundary condition to define at all.</p>
+          <span class="num">01</span>
+          <h3>Surrogate Thermal Model: Gaussian Process and Transient Network</h3>
+          <p>A Gaussian process trained on full-car CFD, feeding a transient thermal network
+            of the M26 pack.</p>
         </div>
       </a>
     </div>

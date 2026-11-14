@@ -58,7 +58,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 <a class="backlink" href="projects.html"><span class="arrow" aria-hidden="true">←</span>All Projects</a>
 
 <header class="masthead">
-  <h1>Building Cooling<br>Into the CFD<br>Workflow</h1>
+  <h1>Building Cooling <br>Into the CFD <br>Workflow</h1>
   <p class="role">The team’s workflow had no fans, no thermal simulation and no
     accumulator ducting. Three attempts at the fan boundary condition, and the one
     that worked.</p>
@@ -72,9 +72,24 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 
 <section id="cfd-pipeline">
   <div class="row">
-    <h2 class="rowlabel">Project 03</h2>
+    <h2 class="rowlabel">Project 02</h2>
     <div>
       <div class="entry">
+
+        <div class="contrib">
+          <h3>My Contribution</h3>
+          <ul>
+            <li><strong>The fan boundary condition</strong>: three attempts, ending in the two-wrap meshing change that made fans definable.</li>
+            <li><strong>The cooling architecture</strong> in the workflow: fans, staged fan curves, hollowed monocoque and accumulator ducting. None of it existed before.</li>
+            <li><strong>22 unit tests</strong> that catch setup failures before a case reaches the cluster.</li>
+            <li><strong>MATLAB post-processing</strong> of the monocoque and accumulator inlet planes.</li>
+          </ul>
+          <p class="meta">Shared: the PyFluent migration was a team effort; I wrote the cooling sections · Workflow source withheld under team IP; the method is described in full</p>
+          <ul class="linkrow">
+            <li><a class="linkbtn" href="fancurve.pdf" target="_blank" rel="noopener">Fan Curve Derivation (PDF)</a></li>
+          </ul>
+        </div>
+
 
         <div class="gallery" data-interval="5000">
           <div class="gstage">
@@ -319,7 +334,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
     <div>
       <a class="projlink noimg" href="project-wind-tunnel.html">
         <div>
-          <span class="num">04</span>
+          <span class="num">03</span>
           <h3>Australian Centre for Sports Aerodynamics: CFD Validation</h3>
           <p>Where the CFD was wrong against tunnel data, by how much, and what changed in
             the setup as a result.</p>

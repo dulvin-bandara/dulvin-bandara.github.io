@@ -381,9 +381,10 @@ html:has(.hero[data-wall="collage"]) .themetoggle:hover{color:var(--field-ink);b
 
 [data-wall="collage"]{
   position:relative;
-  height:calc(100vh - var(--hero-offset, 102px));
-  height:calc(100svh - var(--hero-offset, 102px));
-  min-height:560px;
+  /* stops short of the fold so the first text row shows there is more below */
+  height:calc(76vh - var(--hero-offset, 102px));
+  height:calc(76svh - var(--hero-offset, 102px));
+  min-height:470px;
   display:block;
 }
 [data-wall="collage"] .pw{
@@ -1280,9 +1281,9 @@ pre.code code{background:none;border:0;padding:0;font-size:inherit;}
     min-height:470px;padding-bottom:24px;
   }
   [data-wall="collage"]{
-    height:calc(100vh - var(--hero-offset, 84px));
-    height:calc(100svh - var(--hero-offset, 84px));
-    min-height:470px;
+    height:calc(74vh - var(--hero-offset, 84px));
+    height:calc(74svh - var(--hero-offset, 84px));
+    min-height:430px;
   }
   [data-wall="collage"] .pw-track{inset:0 0 25% 0;}
   [data-wall="collage"] .pw-item{border-radius:10px;}
@@ -1340,4 +1341,44 @@ pre.code code{background:none;border:0;padding:0;font-size:inherit;}
   .heropause,.gplay{display:none !important;}   /* nothing is moving */
   [data-wall="band"] .pw{overflow-x:auto;}
   @view-transition{navigation:none;}
+}
+
+/* ---------- hero role line, seeking line, contribution block ---------- */
+
+.tagline{display:none;}
+[data-wall="collage"] .tagline{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:3px 24px;
+  max-width:none;
+  margin:0 0 12px;
+  font-family:var(--mono);
+  font-size:11.5px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--field-ink);
+  text-wrap:balance;
+}
+
+.seeking{
+  font-size:clamp(19px,2vw,22px);
+  line-height:1.45;
+  margin-bottom:10px;
+}
+.seeking strong{font-weight:600;}
+
+.contrib{
+  border-left:2px solid var(--accent);
+  padding:2px 0 2px 22px;
+  margin:0 0 38px;
+}
+.contrib h3,.contrib h3:first-of-type{margin-top:0;}
+.contrib ul{margin-bottom:12px;}
+.contrib strong{font-weight:600;}
+.contrib .linkrow{margin:16px 0 4px;padding-left:0;}
+.contrib .meta{margin-bottom:0;}
+
+@media print{
+  [data-wall="collage"] .tagline{color:#000;letter-spacing:0.06em;}
 }
