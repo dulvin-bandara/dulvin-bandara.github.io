@@ -1869,3 +1869,11 @@ html:has(.hero[data-wall="collage"]) .sitenav :focus-visible{outline-color:var(-
   }
 }
 @media print{ .flowcanvas{display:none;} }
+
+/* on wide screens the graphics window runs to the right edge of the pane,
+   past the text column's maximum width */
+@media (min-width:1101px){
+  [data-wall="collage"] .pw{right:auto;width:calc(100vw - var(--side));}
+}
+/* the still-frame fallback has nothing to pause */
+.flow-still .heropause{display:none;}

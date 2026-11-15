@@ -17,8 +17,26 @@
   var canvas = document.querySelector('.flowcanvas');
   if (!canvas) return;
   var hero = canvas.closest('.hero');
-  var gl = canvas.getContext('webgl', { antialias: true, alpha: true, premultipliedAlpha: false });
-  if (!gl) { canvas.hidden = true; return; }
+  var force2d = /[?&]flow=2d\b/.test(location.search);
+  var gl = force2d ? null : canvas.getContext('webgl', { antialias: true, alpha: true, premultipliedAlpha: false });
+  var ctx2d = null;      // set when WebGL is unavailable: a still frame on a 2D canvas
+  var flat = null;       // the geometry the 2D renderer needs
+
+  // WebGL can be missing, blocked, or lost mid-session. In each case the hero
+  // falls back to one finished frame drawn with the 2D canvas API.
+  function use2d() {
+    if (ctx2d) return;
+    var fresh = canvas.cloneNode(false);
+    canvas.parentNode.replaceChild(fresh, canvas);
+    canvas = fresh;
+    gl = null; scene = null; running = false;
+    ctx2d = canvas.getContext('2d');
+    if (!ctx2d) { canvas.hidden = true; return; }
+    canvas.classList.add('is-ready', 'is-still');
+    hero.classList.add('flow-still');
+    readTheme(); resize();
+  }
+  canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); use2d(); });
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -192,9 +210,12 @@
       }
     }
 
+    flat = { pos: pos, idx: idx, nT: nT, line: qline, spd: qspd, nL: nL, P: P, range: range };
+    if (!gl) { use2d(); return; }
+
     var mp, lpg;
     try { mp = program(MESH_VS, MESH_FS); lpg = program(LINE_VS, LINE_FS); }
-    catch (e) { canvas.hidden = true; return; }
+    catch (e) { use2d(); return; }
 
     scene = {
       mesh: mp, line: lpg,
@@ -220,11 +241,12 @@
     colors.hot = hex(dark ? '#fca50a' : '#c33b4f');
     colors.shade = dark ? 0.16 : 0.10;
     colors.alpha = dark ? 0.95 : 0.9;
-    var r = RAMP[dark ? 'dark' : 'light'], flat = [];
+    var r = RAMP[dark ? 'dark' : 'light'], flat = [];   // local: the ramp as one float list
     r.forEach(function (h) { flat = flat.concat(hex(h)); });
     colors.ramp = new Float32Array(flat);
+    colors.dark = dark;
   }
-  new MutationObserver(function () { readTheme(); if (!running) draw(); })
+  new MutationObserver(function () { readTheme(); if (!running) redraw(); })
     .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   var view = { w: 1, h: 1, cx: 0, cy: 0, scale: 1 };
@@ -240,7 +262,9 @@
     var bottom = mast ? mast.getBoundingClientRect().top - r.top : r.height;
     if (bottom - top < 120) { top = 0; bottom = r.height * 0.7; }
     view.bandTop = top + 14; view.bandBottom = bottom - 6;
-    if (!running && scene) draw();
+    // centre on the wordmark, which is narrower than the canvas on wide screens
+    view.midX = mast ? (mast.getBoundingClientRect().left + mast.getBoundingClientRect().right) / 2 - r.left : r.width / 2;
+    if (!running) redraw();
   }
   var rt;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(resize, 100); });
@@ -252,7 +276,7 @@
   var aim = { x: 0, y: 0 }, look = { x: 0, y: 0 };
   if (!reduced && window.matchMedia('(hover:hover)').matches) {
     hero.addEventListener('pointermove', function (e) {
-      var r = canvas.getBoundingClientRect();
+      var r = hero.getBoundingClientRect();
       aim.x = ((e.clientX - r.left) / r.width - 0.5) * 2;
       aim.y = ((e.clientY - r.top) / r.height - 0.5) * 2;
     });
@@ -263,6 +287,107 @@
 
   var clock = 0, last = 0, running = false, visible = true;
 
+  function redraw() {
+    if (ctx2d) draw2d(); else if (scene) draw();
+  }
+
+  // model-view-projection for time t, and the rotation alone (for lighting)
+  function camera(t, still) {
+    look.x += (aim.x - look.x) * 0.05; look.y += (aim.y - look.y) * 0.05;
+    var yaw = still ? -0.62 : -0.62 + Math.sin(t * 0.21) * 0.20 + look.x * 0.22;
+    var pitch = still ? 0.05 : 0.05 + Math.sin(t * 0.13) * 0.03 + look.y * 0.10;
+
+    // fit the head (height about 2.1 units) to the clear band
+    var fov = 0.42, dist = 9;
+    var bandH = Math.max(80, view.bandBottom - view.bandTop);
+    var unitPx = (view.h / 2) / (Math.tan(fov / 2) * dist);  // px per model unit at the origin
+    var zoom = Math.min(bandH * 0.92 / 2.1, view.w * 0.9 / 2.2) / unitPx;
+    var cy = (view.bandTop + view.bandBottom) / 2;
+    var offY = (view.h / 2 - cy) / (view.h / 2);             // clip-space shift up to the band
+    var offX = ((view.midX || view.w / 2) - view.w / 2) / (view.w / 2);
+
+    var proj = perspective(fov, view.w / view.h, 1, 40);
+    var model = rotYX(yaw, pitch);
+    var mv = model.slice();
+    for (var i = 0; i < 12; i++) mv[i] *= zoom;
+    mv[14] = -dist;
+    // shift after projection so perspective stays centred on the head
+    var shift = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, offX, offY, 0, 1];
+    return {
+      mvp: mul(shift, mul(proj, mv)),
+      rot: [model[0], model[1], model[2], model[4], model[5], model[6], model[8], model[9], model[10]],
+      dist: dist
+    };
+  }
+
+  /* ---------- 2D fallback: one finished frame, painter's algorithm ---------- */
+
+  function draw2d() {
+    var d = flat, c = ctx2d; if (!d || !c) return;
+    var cam = camera(60, true), m = cam.mvp, W = view.w, H = view.h, i, j;
+    c.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
+    c.clearRect(0, 0, W, H);
+
+    function project(x, y, z, out, o) {
+      var w = m[3] * x + m[7] * y + m[11] * z + m[15];
+      out[o] = ((m[0] * x + m[4] * y + m[8] * z + m[12]) / w * 0.5 + 0.5) * W;
+      out[o + 1] = (0.5 - (m[1] * x + m[5] * y + m[9] * z + m[13]) / w * 0.5) * H;
+      out[o + 2] = w;                                  // distance from the eye
+    }
+    var nV = d.pos.length / 3, sp = new Float32Array(nV * 3);
+    for (i = 0; i < nV; i++) project(d.pos[i * 3], d.pos[i * 3 + 1], d.pos[i * 3 + 2], sp, i * 3);
+
+    var rgb = function (a) { return Math.round(a[0] * 255) + ',' + Math.round(a[1] * 255) + ',' + Math.round(a[2] * 255); };
+    function rampAt(x) {
+      x = Math.min(0.9999, Math.max(0, x)) * 6;
+      var k = Math.floor(x), f = x - k, r = colors.ramp, o = [];
+      for (var q = 0; q < 3; q++) o[q] = r[k * 3 + q] + (r[k * 3 + 3 + q] - r[k * 3 + q]) * f;
+      return rgb(o);
+    }
+
+    // streamlines, split into the part behind the head and the part in front
+    var lp = new Float32Array(d.nL * d.P * 3);
+    for (i = 0; i < d.nL * d.P; i++) {
+      project(d.line[i * 3] / 32767 * d.range, d.line[i * 3 + 1] / 32767 * d.range, d.line[i * 3 + 2] / 32767 * d.range, lp, i * 3);
+    }
+    function lines(front) {
+      c.lineWidth = W < 620 ? 1.1 : 1.5;
+      c.lineCap = 'round';
+      for (var l = 0; l < d.nL; l++) {
+        for (var k = 0; k < d.P - 1; k++) {
+          var a = (l * d.P + k) * 3, b = a + 3;
+          if (((lp[a + 2] + lp[b + 2]) / 2 < cam.dist) !== front) continue;
+          var t = k / (d.P - 1), ends = Math.min(1, t / 0.1) * Math.min(1, (1 - t) / 0.12);
+          c.strokeStyle = 'rgba(' + rampAt(d.spd[l * d.P + k] / 255) + ',' + (0.62 * ends * colors.alpha).toFixed(3) + ')';
+          c.beginPath(); c.moveTo(lp[a], lp[a + 1]); c.lineTo(lp[b], lp[b + 1]); c.stroke();
+        }
+      }
+    }
+
+    lines(false);
+
+    // surface: far cells first, each filled with the ground colour so it hides what is behind it
+    var order = new Uint32Array(d.nT), depth = new Float32Array(d.nT);
+    for (i = 0; i < d.nT; i++) {
+      order[i] = i;
+      depth[i] = sp[d.idx[i * 3] * 3 + 2] + sp[d.idx[i * 3 + 1] * 3 + 2] + sp[d.idx[i * 3 + 2] * 3 + 2];
+    }
+    Array.prototype.sort.call(order, function (a, b) { return depth[b] - depth[a]; });
+    c.fillStyle = 'rgb(' + rgb(colors.ground) + ')';
+    c.strokeStyle = 'rgba(' + rgb(colors.ink) + ',' + (colors.dark ? 0.42 : 0.5) + ')';
+    c.lineWidth = 0.6;
+    c.lineJoin = 'round';
+    for (j = 0; j < d.nT; j++) {
+      i = order[j] * 3;
+      var p0 = d.idx[i] * 3, p1 = d.idx[i + 1] * 3, p2 = d.idx[i + 2] * 3;
+      c.beginPath();
+      c.moveTo(sp[p0], sp[p0 + 1]); c.lineTo(sp[p1], sp[p1 + 1]); c.lineTo(sp[p2], sp[p2 + 1]);
+      c.closePath(); c.fill(); c.stroke();
+    }
+
+    lines(true);
+  }
+
   function draw() {
     var s = scene; if (!s) return;
     var t = reduced ? 60 : clock;
@@ -272,28 +397,7 @@
     var grow = Math.min(1, Math.max(0, (t - 1.7) / 3.2));    // then the streamlines
     var sweep = s.top + (s.bottom - 0.2 - s.top) * meshIn;
 
-    look.x += (aim.x - look.x) * 0.05; look.y += (aim.y - look.y) * 0.05;
-    var yaw = -0.62 + Math.sin(t * 0.21) * 0.20 + look.x * 0.22;
-    var pitch = 0.05 + Math.sin(t * 0.13) * 0.03 + look.y * 0.10;
-
-    // fit the head (height about 2.1 units) to the clear band
-    var fov = 0.42, dist = 9;
-    var bandH = Math.max(80, view.bandBottom - view.bandTop);
-    var unitPx = (view.h / 2) / (Math.tan(fov / 2) * dist);  // px per model unit at the origin
-    var zoom = Math.min(bandH * 0.92 / 2.1, view.w * 0.9 / 2.2) / unitPx;
-    var cy = (view.bandTop + view.bandBottom) / 2;
-    var offY = (view.h / 2 - cy) / (view.h / 2);             // clip-space shift up to the band
-
-    var proj = perspective(fov, view.w / view.h, 1, 40);
-    var model = rotYX(yaw, pitch);
-    var mv = model.slice();
-    for (var i = 0; i < 12; i++) mv[i] *= zoom;
-    mv[14] = -dist;
-    var mvp = mul(proj, mv);
-    // shift after projection so perspective stays centred on the head
-    var shift = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, offY, 0, 1];
-    mvp = mul(shift, mvp);
-    var rot = [model[0], model[1], model[2], model[4], model[5], model[6], model[8], model[9], model[10]];
+    var cam = camera(t, reduced), mvp = cam.mvp, rot = cam.rot;
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 0);
@@ -353,16 +457,30 @@
     gl.depthMask(true);
   }
 
+  // Some setups hand out a WebGL context that then draws nothing. Once the
+  // mesh should be fully in, sample the middle of the head; if every pixel is
+  // still empty, switch to the 2D frame.
+  var checked = false;
+  function blank() {
+    var n = 48, px = new Uint8Array(n * n * 4);
+    var x = Math.round((view.midX || view.w / 2) * view.dpr - n / 2);
+    var y = Math.round(canvas.height - ((view.bandTop + view.bandBottom) / 2) * view.dpr - n / 2);
+    gl.readPixels(Math.max(0, x), Math.max(0, y), n, n, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    for (var i = 3; i < px.length; i += 4) if (px[i]) return false;
+    return true;
+  }
+
   function frame(now) {
     if (!running) return;
     var dt = Math.min(1, (now - last) / 1000 || 0);
     last = now;
     clock += dt;
     draw();
+    if (!checked && clock > 4) { checked = true; if (blank()) { use2d(); return; } }
     requestAnimationFrame(frame);
   }
   function setRunning(on) {
-    on = on && !reduced && visible && !document.hidden && !hero.classList.contains('is-paused');
+    on = on && !!scene && !reduced && visible && !document.hidden && !hero.classList.contains('is-paused');
     if (on === running) return;
     running = on;
     if (on) { last = performance.now(); requestAnimationFrame(frame); }
@@ -371,10 +489,15 @@
     canvas.classList.add('is-ready');
     draw();
     setRunning(true);
+    // if animation frames are not being delivered (a throttled or background
+    // tab), show the finished frame rather than an empty panel
+    setTimeout(function () {
+      if (scene && clock < 0.2) { clock = 8; draw(); }
+    }, 2500);
   }
 
   if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (e) { visible = e[0].isIntersecting; setRunning(true); }).observe(canvas);
+    new IntersectionObserver(function (e) { visible = e[0].isIntersecting; setRunning(true); }).observe(hero);
   }
   document.addEventListener('visibilitychange', function () { setRunning(true); });
   // the hero's pause button toggles .is-paused on the hero (theme.js)
