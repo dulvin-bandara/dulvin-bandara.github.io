@@ -220,6 +220,12 @@
     }
 
     flat = { pos: pos, idx: idx, nT: nT, line: qline, spd: qspd, nL: nL, P: P, range: range };
+    // the graphics window's title strip reports what was actually loaded
+    var stats = hero.querySelector('.vp-stats');
+    if (stats) {
+      stats.textContent = 'Surface mesh · ' + nV.toLocaleString('en') + ' nodes · ' + nT.toLocaleString('en') +
+        ' faces · ' + nL + ' streamlines';
+    }
     if (!gl) { use2d(); return; }
 
     var mp, lpg;
@@ -269,6 +275,12 @@
     var mast = hero.querySelector('.masthead'), nav = document.querySelector('.sitenav');
     var top = nav ? Math.max(0, nav.getBoundingClientRect().bottom - r.top) : 0;
     var bottom = mast ? mast.getBoundingClientRect().top - r.top : r.height;
+    var head = hero.querySelector('.vp-head'), leg = hero.querySelector('.vp-legend');
+    if (head) top = Math.max(top, head.getBoundingClientRect().bottom - r.top);
+    if (leg) {
+      var lr = leg.getBoundingClientRect();
+      if (lr.width > lr.height * 2) top = Math.max(top, lr.bottom - r.top);
+    }
     if (bottom - top < 120) { top = 0; bottom = r.height * 0.7; }
     view.bandTop = top + 14; view.bandBottom = bottom - 6;
     // centre on the wordmark, which is narrower than the canvas on wide screens
@@ -295,6 +307,9 @@
   /* ---------- draw ---------- */
 
   var clock = 0, last = 0, running = false, visible = true;
+
+  // the tool row's Display buttons set these classes on the hero (shell.js)
+  function shown(what) { return !hero.classList.contains('no-' + what); }
 
   function redraw() {
     if (ctx2d) draw2d(); else if (scene) draw();
@@ -373,7 +388,7 @@
       }
     }
 
-    lines(false);
+    if (shown('lines')) lines(false);
 
     // surface: far cells first, each filled with the ground colour so it hides what is behind it
     var order = new Uint32Array(d.nT), depth = new Float32Array(d.nT);
@@ -386,7 +401,7 @@
     c.strokeStyle = 'rgba(' + rgb(colors.ink) + ',' + (colors.dark ? 0.42 : 0.5) + ')';
     c.lineWidth = 0.6;
     c.lineJoin = 'round';
-    for (j = 0; j < d.nT; j++) {
+    for (j = 0; shown('mesh') && j < d.nT; j++) {
       i = order[j] * 3;
       var p0 = d.idx[i] * 3, p1 = d.idx[i + 1] * 3, p2 = d.idx[i + 2] * 3;
       c.beginPath();
@@ -394,7 +409,7 @@
       c.closePath(); c.fill(); c.stroke();
     }
 
-    lines(true);
+    if (shown('lines')) lines(true);
   }
 
   function draw() {
@@ -428,13 +443,14 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, s.pos); gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, s.nrm); gl.enableVertexAttribArray(aNrm); gl.vertexAttribPointer(aNrm, 3, gl.FLOAT, false, 0, 0);
 
+    var meshOn = shown('mesh');
     gl.disable(gl.BLEND);
     gl.depthMask(true);
     gl.enable(gl.POLYGON_OFFSET_FILL);
     gl.polygonOffset(1, 1);
     gl.uniform1f(u(s.mesh, 'uMode'), 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.tri);
-    gl.drawElements(gl.TRIANGLES, s.nTri, gl.UNSIGNED_SHORT, 0);
+    if (meshOn) gl.drawElements(gl.TRIANGLES, s.nTri, gl.UNSIGNED_SHORT, 0);
     gl.disable(gl.POLYGON_OFFSET_FILL);
 
     gl.enable(gl.BLEND);
@@ -442,11 +458,11 @@
     gl.depthMask(false);
     gl.uniform1f(u(s.mesh, 'uMode'), 1);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.edge);
-    gl.drawElements(gl.LINES, s.nEdge, gl.UNSIGNED_SHORT, 0);
+    if (meshOn) gl.drawElements(gl.LINES, s.nEdge, gl.UNSIGNED_SHORT, 0);
     gl.disableVertexAttribArray(aNrm);
 
     /* streamlines */
-    if (grow > 0) {
+    if (grow > 0 && shown('lines')) {
       gl.useProgram(s.line);
       gl.uniformMatrix4fv(u(s.line, 'uMVP'), false, new Float32Array(mvp));
       gl.uniform2f(u(s.line, 'uPx'), 2 / view.w, 2 / view.h);
@@ -512,5 +528,12 @@
   }
   document.addEventListener('visibilitychange', function () { setRunning(true); });
   // the hero's pause button toggles .is-paused on the hero (theme.js)
-  new MutationObserver(function () { setRunning(true); }).observe(hero, { attributes: true, attributeFilter: ['class'] });
+  new MutationObserver(function () { setRunning(true); if (!running) redraw(); })
+    .observe(hero, { attributes: true, attributeFilter: ['class'] });
+  // "Regenerate" in the tool row: run the mesh sweep and streamline growth again
+  hero.addEventListener('flow:replay', function () {
+    if (!scene || reduced) return;
+    clock = 0;
+    if (!running) draw();
+  });
 })();

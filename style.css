@@ -1545,8 +1545,11 @@ figcaption .q:empty{display:none;}
    ============================================================ */
 
 :root{
-  --bar-h:46px;
+  --tab-h:46px;                              /* ribbon tabs */
+  --tool-h:40px;                             /* tool row under them */
+  --bar-h:calc(var(--tab-h) + var(--tool-h)); /* everything fixed to the top */
   --status-h:28px;
+  --console-h:212px;
   --side:272px;
   --chrome:var(--paper-2);
   --chrome-2:var(--paper-3);
@@ -1561,7 +1564,7 @@ figcaption .q:empty{display:none;}
   top:0;left:0;right:0;
   z-index:60;
   max-width:none;
-  height:var(--bar-h);
+  height:var(--tab-h);
   margin:0;
   padding:0 14px 0 0;
   gap:0;
@@ -1877,3 +1880,307 @@ html:has(.hero[data-wall="collage"]) .sitenav :focus-visible{outline-color:var(-
 }
 /* the still-frame fallback has nothing to pause */
 .flow-still .heropause{display:none;}
+
+
+/* ============================================================
+   SOLVER CHROME
+   The rest of the CFD-package look: a tool row under the ribbon
+   tabs, a residual monitor and report under the outline tree, a
+   console dock above the status bar, and a window title and
+   colour legend on the index graphics window. The links in the
+   tool row work on their own; the buttons, monitor and console
+   are built or enabled by shell.js.
+   ============================================================ */
+
+:root{
+  /* the streamline colour map, low to high (matches RAMP in flow.js) */
+  --vel-stops:#1230c8,#0b78dc,#0aa9a6,#1fa83c,#b3b80e,#ee8a0a,#d8201a;
+  --res-a:#1230c8; --res-b:#1fa83c; --res-c:#d8201a;
+}
+:root[data-theme="dark"]{
+  --vel-stops:#2748ff,#1f9bff,#17dcd4,#3fe05a,#d9ea2a,#ffad1a,#ff3a26;
+  --res-a:#5f7bff; --res-b:#3fe05a; --res-c:#ff5a47;
+}
+
+/* ---------- tool row ---------- */
+
+.toolbar{
+  position:fixed;
+  top:var(--tab-h);left:0;right:0;
+  z-index:59;
+  height:var(--tool-h);
+  display:flex;
+  align-items:stretch;
+  background:var(--paper);
+  border-bottom:1px solid var(--rule-strong);
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.02em;
+  white-space:nowrap;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+}
+.toolbar::-webkit-scrollbar{display:none;}
+.tb-group{
+  display:flex;
+  align-items:center;
+  gap:2px;
+  padding:0 10px 0 0;
+  border-right:1px solid var(--rule);
+}
+.tb-group[hidden]{display:none;}
+.tb-label{
+  align-self:stretch;
+  display:flex;
+  align-items:center;
+  padding:0 10px 0 16px;
+  margin-right:4px;
+  font-size:9.5px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+}
+.tb{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  height:28px;
+  padding:0 9px;
+  background:transparent;
+  border:1px solid transparent;
+  border-radius:3px;
+  color:var(--ink-soft);
+  font:inherit;
+  letter-spacing:inherit;
+  text-decoration:none;
+  cursor:pointer;
+  transition:color .15s var(--ease),background-color .15s var(--ease),border-color .15s var(--ease);
+}
+.tb[hidden]{display:none;}
+.tb::before{
+  content:"";
+  flex:0 0 auto;
+  width:15px;height:15px;
+  background:currentColor;
+  -webkit-mask:var(--i) center/contain no-repeat;
+  mask:var(--i) center/contain no-repeat;
+}
+.tb:hover{color:var(--ink);background:var(--chrome);border-color:var(--rule);}
+.tb:active{transform:translateY(1px);}
+.tb:focus-visible{outline-offset:-2px;}
+.tb[aria-pressed="true"]{color:var(--ink);background:var(--chrome-2);border-color:var(--rule-strong);}
+.tb[data-act="run"]{color:var(--ink);}
+.tb[data-act="run"]::before{color:var(--res-b);}
+.tb[data-act="run"][aria-pressed="true"]::before{color:var(--res-c);}
+.tb[data-i="open"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4.5h4l1.5 1.5H14v6.5H2z'/%3E%3C/svg%3E");}
+.tb[data-i="export"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 2v8M5 7l3 3 3-3M3 13h10'/%3E%3C/svg%3E");}
+.tb[data-i="mail"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4h12v8H2zM2 4.5l6 4.5 6-4.5'/%3E%3C/svg%3E");}
+.tb[data-i="init"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 3v10M13 3 6.5 8l6.5 5z'/%3E%3C/svg%3E");}
+.tb[data-i="step"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 3l6.5 5-6.5 5zM12.5 3v10'/%3E%3C/svg%3E");}
+.tb[data-i="run"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 2.5l8.5 5.5-8.5 5.5z'/%3E%3C/svg%3E");}
+.tb[data-i="mesh"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 13h12L8 3zM5 8h6l-3 5z'/%3E%3C/svg%3E");}
+.tb[data-i="lines"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 5c4 0 4-2 12-2M2 8c4 0 5 1 12 0M2 11c4 0 4 2 12 2'/%3E%3C/svg%3E");}
+.tb[data-i="remesh"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 8a5 5 0 1 1-1.5-3.5M13 2v3h-3'/%3E%3C/svg%3E");}
+.tb[data-i="console"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 3h12v10H2zM4.5 6.5l2 1.5-2 1.5M8 10h3'/%3E%3C/svg%3E");}
+.tb[data-act="run"][aria-pressed="true"]{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h8v8H4z'/%3E%3C/svg%3E");}
+
+/* ---------- outline: tree above, monitor below ---------- */
+
+.outline{display:flex;flex-direction:column;overflow:hidden;}
+.outline > .outline-head{flex:0 0 auto;}
+.outline > nav{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
+.monitor{flex:0 0 auto;border-top:1px solid var(--rule-strong);}
+.monitor .outline-head{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--rule);}
+.monitor .outline-head:first-child{border-top:none;}
+.monitor .outline-head b{font-weight:400;letter-spacing:0.04em;text-transform:none;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
+.resplot{display:block;width:100%;height:118px;background:var(--paper);}
+.reskey{
+  display:flex;gap:12px;margin:0;padding:5px 16px 7px;max-width:none;
+  background:var(--paper);
+  font-size:10px;color:var(--ink-faint);
+}
+.reskey span{display:inline-flex;align-items:center;gap:5px;}
+.reskey span::before{content:"";width:10px;height:2px;background:var(--k);}
+.props{
+  display:grid;grid-template-columns:auto 1fr;gap:0;margin:0;padding:4px 0 6px;
+  font-size:11px;
+}
+.props dt,.props dd{margin:0;padding:4px 16px;border-bottom:1px solid var(--rule);}
+.props dt{color:var(--ink-faint);padding-right:6px;}
+.props dd{color:var(--ink);text-align:right;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.props dt:nth-last-child(2),.props dd:last-child{border-bottom:none;}
+/* short windows and the drawer keep the plot and drop the report, so the tree has room */
+@media (max-height:760px),(max-width:1100px){ .monitor .props,.monitor .mon-report{display:none;} }
+@media (max-height:600px){ .monitor{display:none;} }
+
+/* ---------- console dock ---------- */
+
+.console{
+  position:fixed;
+  left:var(--side);right:0;
+  bottom:var(--status-h);
+  z-index:58;
+  height:var(--console-h);
+  display:flex;
+  flex-direction:column;
+  background:var(--paper);
+  border-top:1px solid var(--rule-strong);
+  box-shadow:0 -10px 30px -18px rgba(0,0,0,.45);
+  font-family:var(--mono);
+  font-size:11.5px;
+  line-height:1.55;
+}
+.console[hidden]{display:none;}
+.con-head{
+  flex:0 0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 6px 0 16px;
+  height:28px;
+  background:var(--chrome-2);
+  border-bottom:1px solid var(--rule);
+  font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-faint);
+}
+.con-close{
+  width:26px;height:22px;padding:0;
+  background:transparent;border:none;color:var(--ink-soft);
+  font:inherit;font-size:15px;line-height:1;cursor:pointer;
+}
+.con-close:hover{color:var(--ink);}
+.con-log{
+  flex:1 1 auto;min-height:0;
+  overflow-y:auto;overscroll-behavior:contain;
+  padding:8px 16px 4px;
+  color:var(--ink-soft);
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font-variant-numeric:tabular-nums;
+}
+.con-log div{min-height:1.55em;}
+.con-log .c-cmd{color:var(--ink);}
+.con-log .c-ok{color:var(--res-b);}
+.con-log .c-err{color:var(--accent);}
+.con-log .c-dim{color:var(--ink-faint);}
+.con-in{
+  flex:0 0 auto;
+  display:flex;align-items:center;gap:8px;
+  margin:0;padding:0 16px;
+  height:32px;
+  border-top:1px solid var(--rule);
+}
+.con-in label{color:var(--field-mid);font-weight:500;}
+.con-in input{
+  flex:1 1 auto;min-width:0;
+  height:100%;
+  padding:0;
+  background:transparent;border:none;outline:none;
+  color:var(--ink);
+  font:inherit;
+  font-size:max(11.5px,1em);
+}
+.con-in input::placeholder{color:var(--ink-faint);opacity:.8;}
+.con-in:focus-within{box-shadow:inset 0 2px 0 -1px var(--accent);}
+.console-open .sheet{padding-bottom:calc(120px + var(--status-h) + var(--console-h));}
+
+.sb-console{cursor:default;}
+.sb-solver{letter-spacing:0.06em;}
+.sb-state{display:inline-flex;align-items:center;gap:6px;}
+.sb-state::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink-faint);}
+.is-solving .sb-state::before{background:var(--res-b);animation:sb-blink 1s steps(2) infinite;}
+.is-converged .sb-state::before{background:var(--res-b);}
+@keyframes sb-blink{50%{opacity:.25;}}
+
+/* ---------- graphics window: title strip, legend ---------- */
+
+.vp-head{
+  position:absolute;
+  /* the hero starts a little below the tool row; the strip sits flush under it */
+  top:calc(var(--bar-h) - var(--hero-offset, var(--bar-h)));
+  left:calc(var(--gutter) * -1);
+  width:calc(100vw - var(--side));
+  z-index:2;
+  display:flex;
+  align-items:stretch;
+  height:28px;
+  border-bottom:1px solid var(--field-rule);
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:0.04em;
+  color:var(--field-soft);
+  white-space:nowrap;
+  pointer-events:none;
+}
+.vp-tab{
+  display:flex;align-items:center;gap:8px;
+  padding:0 14px 0 16px;
+  color:var(--field-ink);
+  border-right:1px solid var(--field-rule);
+  box-shadow:inset 0 2px 0 var(--accent);
+}
+.vp-tab::before{content:"";width:8px;height:8px;border:1px solid currentColor;opacity:.7;}
+.vp-stats{display:flex;align-items:center;padding:0 14px;min-width:0;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;}
+
+.vp-legend{
+  position:absolute;
+  left:calc(18px - var(--gutter));
+  top:calc(var(--bar-h) - var(--hero-offset, var(--bar-h)) + 46px);
+  z-index:2;
+  display:grid;
+  grid-template-columns:12px auto;
+  gap:8px 8px;
+  font-family:var(--mono);
+  font-size:10px;
+  line-height:1;
+  color:var(--field-soft);
+  pointer-events:none;
+  font-variant-numeric:tabular-nums;
+}
+.vl-title{grid-column:1 / -1;line-height:1.35;letter-spacing:0.04em;color:var(--field-ink);}
+.vl-title small{display:block;font-size:inherit;color:var(--field-soft);}
+.vl-bar{
+  height:clamp(96px,17vh,168px);
+  background:linear-gradient(0deg,var(--vel-stops));
+  box-shadow:0 0 0 1px var(--field-rule);
+}
+.vl-ticks{
+  list-style:none;margin:0;padding:0;max-width:none;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.vl-ticks li{margin:0;display:flex;align-items:center;gap:5px;height:0;}
+.vl-ticks li::before{content:"";width:5px;border-top:1px solid var(--field-soft);}
+.hero.no-lines .vp-legend{opacity:.35;}
+
+@media (max-width:1100px){
+  .tb-label{display:none;}
+  .tb-group{padding-left:8px;}
+  .console{left:0;}
+  .vp-head{width:100vw;}
+}
+@media (max-width:620px){
+  :root{--tool-h:38px;--console-h:46vh;}
+  .tb{padding:0 7px;gap:6px;}
+  .sb-solver{display:none;}
+  .vp-stats{font-size:9.5px;padding:0 10px;}
+  .vp-tab{padding:0 10px 0 12px;}
+  /* the legend lies down under the title strip: title, 0.00, bar, 1.00 */
+  .vp-legend{
+    top:calc(var(--bar-h) - var(--hero-offset, var(--bar-h)) + 38px);left:calc(12px - var(--gutter));
+    display:flex;align-items:center;gap:7px;
+  }
+  .vl-title small{display:none;}
+  .vl-bar{order:2;width:84px;height:7px;background:linear-gradient(90deg,var(--vel-stops));}
+  .vl-ticks{display:contents;}
+  .vl-ticks li{height:auto;display:none;}
+  .vl-ticks li::before{display:none;}
+  .vl-ticks li:last-child{display:block;order:1;}
+  .vl-ticks li:first-child{display:block;order:3;}
+}
+@media (prefers-reduced-motion:reduce){
+  .is-solving .sb-state::before{animation:none;}
+}
+@media print{
+  .toolbar,.console,.vp-head,.vp-legend{display:none !important;}
+}
+
+/* the still frame has no build to replay */
+html:has(.flow-still) .tb[data-act="remesh"]{display:none;}
