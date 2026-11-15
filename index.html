@@ -20,7 +20,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="canonical" href="https://dulvinbandara.com/">
 <meta name="author" content="Dulvin Bandara">
@@ -187,7 +187,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
           <p>A machine-learning surrogate trained on 34 full-car CFD cases, feeding a
             120-cell thermal network in Python. Held-out R² of 0.9932.</p>
           <div class="projmeta">
-            <span class="tag">Software</span>
+            <span class="tag" data-k="software">Software</span>
             <span translate="no">Python</span><span translate="no">scikit-learn</span><span translate="no">pytest</span><span>2026</span>
           </div>
         </div>
@@ -202,7 +202,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
           <p>Fan boundary conditions, thermal simulation and accumulator ducting added
             to a workflow that had none, then carried into PyFluent on HPC.</p>
           <div class="projmeta">
-            <span class="tag">Engineering</span>
+            <span class="tag" data-k="engineering">Engineering</span>
             <span>PyFluent</span><span>SLURM</span><span>MATLAB</span><span>2026</span>
           </div>
         </div>
@@ -217,7 +217,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
           <p>A week correlating our CFD against tunnel data on two cars. Lift
             discrepancy cut from 23% to roughly 10%.</p>
           <div class="projmeta">
-            <span class="tag">Engineering</span>
+            <span class="tag" data-k="engineering">Engineering</span>
             <span>Correlation</span><span>DPMS</span><span>MATLAB</span><span>2026</span>
           </div>
         </div>
@@ -232,7 +232,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
           <p>External sidepod ducting and an internal flow path for the M26 pack.
             0.768&nbsp;CLA recovered across the design iteration, balance on 50.0%.</p>
           <div class="projmeta">
-            <span class="tag">Engineering</span>
+            <span class="tag" data-k="engineering">Engineering</span>
             <span>Siemens NX</span><span>Ansys Fluent</span><span>2026</span>
           </div>
         </div>
@@ -250,7 +250,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
           <p>A vintage camcorder, a DJI drone and a phone. The counterweight to a year
             spent looking at residual plots.</p>
           <div class="projmeta">
-            <span class="tag">Personal</span>
+            <span class="tag" data-k="personal">Personal</span>
             <span>Camcorder</span><span>DJI</span><span>Ongoing</span>
           </div>
         </div>
@@ -302,5 +302,6 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 
 <script src="theme.js" defer></script>
 <script src="reveal.js" defer></script>
+<script src="cbar.js" defer></script>
 </body>
 </html>
