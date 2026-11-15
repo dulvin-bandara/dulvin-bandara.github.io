@@ -37,7 +37,7 @@
     var(--f-66),var(--f-80),var(--f-94);
   --ramp:linear-gradient(90deg,var(--ramp-stops));
 
-  --grain-opacity:.055;
+  --grain-opacity:.095;
   --shadow:0 1px 2px rgba(17,21,26,.04);
 
   /* the index collage paints its own field; these follow the theme */
@@ -76,7 +76,7 @@
   --field-mid:var(--f-66);
   --field-hi:var(--f-80);
 
-  --grain-opacity:.085;   /* grain needs more presence on a dark ground */
+  --grain-opacity:.125;   /* grain needs more presence on a dark ground */
   --shadow:0 1px 2px rgba(0,0,0,.3);
 
   --field:#07080A;
