@@ -18,6 +18,26 @@
   --rule-strong:#BEBAB0;
   --accent:#B4432A;
   --accent-soft:#F3E3DC;
+
+  /* --- inferno ramp, sampled from matplotlib.colormaps['inferno'] --- */
+  --f-00:#10092d;  --f-22:#4a0c6b;  --f-38:#8c2369;  --f-52:#c33b4f;
+  --f-66:#eb6628;  --f-80:#fca50a;  --f-94:#f2ea69;
+
+  /* semantic roles — light theme samples the DARK half of the ramp */
+  --field-lo:var(--f-22);
+  --field-mid:var(--f-38);
+  --field-hi:var(--f-52);
+
+  /* diverging (coolwarm), for signed quantities */
+  --d-neg:#3b4cc0;  --d-neg-soft:#8db0fe;  --d-zero:#dddcdc;
+  --d-pos-soft:#f4987a;  --d-pos:#b40426;
+
+  /* the full ramp as a reusable gradient; --ramp-dir turns it */
+  --ramp-stops:var(--f-00),var(--f-22),var(--f-38),var(--f-52),
+    var(--f-66),var(--f-80),var(--f-94);
+  --ramp:linear-gradient(90deg,var(--ramp-stops));
+
+  --grain-opacity:.055;
   --shadow:0 1px 2px rgba(17,21,26,.04);
 
   /* the index collage paints its own field; these follow the theme */
@@ -50,6 +70,13 @@
   --rule-strong:#3A4048;
   --accent:#E2714E;
   --accent-soft:#2A1C16;
+
+  /* dark theme samples the BRIGHT half of the same ramp */
+  --field-lo:var(--f-52);
+  --field-mid:var(--f-66);
+  --field-hi:var(--f-80);
+
+  --grain-opacity:.085;   /* grain needs more presence on a dark ground */
   --shadow:0 1px 2px rgba(0,0,0,.3);
 
   --field:#07080A;
@@ -932,14 +959,20 @@ li{margin-bottom:7px;}
   font-size:13px;
   text-align:right;
   font-variant-numeric:tabular-nums;
-  color:#11151A;
 }
 
-.m0{background:#E6EEE4;}
-.m1{background:#EFF1DF;}
-.m2{background:#F8F0DA;}
-.m3{background:#F7E4D4;}
-.m4{background:#F0D2C8;}
+/* Signed cells, coolwarm: .neg is blue, .pos is red, m1–m4 is the magnitude
+   bucket. m0 is zero and stays bare paper, the midpoint of the map. */
+.dtable td{color:var(--ink);}
+.m0{background:transparent;}
+.neg.m1{background:color-mix(in srgb,var(--d-neg) 14%,var(--paper));}
+.neg.m2{background:color-mix(in srgb,var(--d-neg) 27%,var(--paper));}
+.neg.m3{background:color-mix(in srgb,var(--d-neg) 41%,var(--paper));}
+.neg.m4{background:color-mix(in srgb,var(--d-neg) 56%,var(--paper));}
+.pos.m1{background:color-mix(in srgb,var(--d-pos) 14%,var(--paper));}
+.pos.m2{background:color-mix(in srgb,var(--d-pos) 27%,var(--paper));}
+.pos.m3{background:color-mix(in srgb,var(--d-pos) 41%,var(--paper));}
+.pos.m4{background:color-mix(in srgb,var(--d-pos) 56%,var(--paper));}
 
 .dlegend{
   display:flex;
@@ -951,6 +984,9 @@ li{margin-bottom:7px;}
   color:var(--ink-faint);
   margin:0 0 28px;
 }
+.dlegend .scale{display:inline-flex;align-items:center;gap:0;}
+.dlegend .scale .sw{margin-right:-1px;}
+.dlegend .scale .end{margin:0 9px;}
 .dlegend .sw{
   display:inline-block;
   width:10px;
@@ -1225,7 +1261,7 @@ pre.code code{background:none;border:0;padding:0;font-size:inherit;}
   .dtable{font-size:8.5pt;break-inside:avoid;}
   .dtable td,.dtable th{padding:3.5pt 6pt;}
   .dtable td{color:#000;}
-  .m0,.m1,.m2,.m3,.m4{
+  .m0,.m1,.m2,.m3,.m4,.cb-ramp{
     -webkit-print-color-adjust:exact;
     print-color-adjust:exact;
   }
@@ -1381,4 +1417,114 @@ pre.code code{background:none;border:0;padding:0;font-size:inherit;}
 
 @media print{
   [data-wall="collage"] .tagline{color:#000;letter-spacing:0.06em;}
+}
+
+/* ============================================================
+   CFD POST-PLOT LAYER
+   One colourmap (inferno), two sampling windows: the light theme
+   takes the dark half, the dark theme the bright half. Field
+   colours are for chrome; paper and ink are for prose.
+   ============================================================ */
+
+/* ---------- grain ---------- */
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  pointer-events:none;
+  opacity:var(--grain-opacity);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:160px 160px;
+}
+
+/* ---------- wide display type (Archivo wdth axis) ---------- */
+
+.masthead h1{
+  font-stretch:122%;
+  font-size:clamp(34px,8.6vw,124px);
+  letter-spacing:-0.035em;
+}
+[data-wall="band"] .masthead h1{font-size:clamp(34px,7.6vw,104px);}
+[data-wall="full"] .masthead h1{font-size:clamp(32px,6.8vw,96px);}
+h2,.projlink h3{font-stretch:112%;}
+h2.rowlabel{font-stretch:normal;}
+
+/* ---------- colourbar scroll indicator (built by cbar.js) ---------- */
+
+.cbar{
+  position:fixed; right:14px; top:50%; transform:translateY(-50%);
+  width:8px; height:min(42vh,320px); border-radius:4px;
+  background:linear-gradient(180deg,var(--ramp-stops));
+  z-index:50; pointer-events:none;
+  box-shadow:0 0 0 1px var(--rule);
+}
+.cbar-tick{
+  position:absolute; left:-5px; right:-5px; top:0; height:2px;
+  background:var(--ink); border-radius:1px;
+  transform:translateY(-1px);
+}
+.cbar-val{
+  position:absolute; right:14px; top:0;
+  font-family:var(--mono); font-size:10px; letter-spacing:.08em;
+  color:var(--ink-faint); white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+  transform:translateY(-50%);
+}
+/* the readout sits in the page margin; below this width there is none */
+@media (max-width:1380px){ .cbar-val{display:none;} }
+@media (max-width:860px){ .cbar{display:none;} }
+
+/* ---------- figcaptions as plot titles ---------- */
+/* captions sit on a near-black scrim in both themes, so the label takes a
+   bright stop rather than a theme-dependent one */
+
+figcaption .q{
+  display:block;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--f-80);
+  margin-bottom:5px;
+}
+figcaption .q:empty{display:none;}
+
+/* ---------- inline colourbar under a contour figure ---------- */
+
+.cb-inline{margin-top:8px;max-width:320px;}
+.cb-ramp{height:6px;border-radius:3px;background:var(--ramp);}
+.cb-ticks{
+  display:flex; justify-content:space-between;
+  font-family:var(--mono); font-size:10px;
+  color:var(--ink-faint); margin-top:3px;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- project tags sampled from the ramp ---------- */
+
+.tag[data-k]{background:transparent;}
+.tag[data-k="engineering"]{color:var(--field-hi);  border-color:var(--field-hi);}
+.tag[data-k="software"]   {color:var(--field-mid); border-color:var(--field-mid);}
+.tag[data-k="personal"]   {color:var(--field-lo);  border-color:var(--field-lo);}
+
+/* ---------- residual-plot sign-off at the foot of each page ---------- */
+
+.sheet::after{
+  content:"";
+  display:block;
+  width:min(320px,100%);
+  aspect-ratio:320/56;
+  margin:72px 0 0;
+  background:var(--field-mid);
+  opacity:.5;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 56' fill='none' stroke='%23000' stroke-width='1.1' stroke-linejoin='round'%3E%3Cpath d='M0 0V56H320' stroke-width='.8'/%3E%3Cpath d='M0 6L8 11L16 18L24 22L32 25L40 29L48 34L56 35L64 36L72 35L80 37L88 37L96 37L104 37L112 38L120 40L128 40L136 40L144 40L152 39L160 39L168 40L176 40L184 41L192 41L200 39L208 40L216 40L224 40L232 39L240 40L248 39L256 41L264 41L272 40L280 40L288 41L296 40L304 41L312 41L320 40'/%3E%3Cpath d='M0 10L8 16L16 20L24 23L32 27L40 32L48 32L56 34L64 38L72 38L80 40L88 41L96 41L104 44L112 42L120 43L128 43L136 45L144 44L152 44L160 46L168 45L176 45L184 46L192 45L200 45L208 45L216 46L224 46L232 45L240 45L248 45L256 46L264 45L272 46L280 47L288 47L296 46L304 47L312 45L320 46'/%3E%3Cpath d='M0 14L8 22L16 26L24 33L32 35L40 39L48 39L56 40L64 43L72 43L80 45L88 48L96 46L104 46L112 47L120 47L128 50L136 49L144 49L152 48L160 51L168 49L176 49L184 49L192 49L200 49L208 50L216 49L224 49L232 50L240 49L248 51L256 49L264 50L272 50L280 50L288 51L296 50L304 50L312 50L320 49'/%3E%3Cpath d='M0 4L8 6L16 13L24 15L32 16L40 16L48 19L56 21L64 22L72 23L80 27L88 25L96 26L104 30L112 29L120 31L128 30L136 32L144 31L152 32L160 32L168 32L176 31L184 32L192 33L200 34L208 34L216 33L224 33L232 34L240 34L248 34L256 34L264 34L272 34L280 33L288 34L296 35L304 33L312 35L320 35'/%3E%3C/svg%3E") no-repeat 0 0/100% 100%;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 56' fill='none' stroke='%23000' stroke-width='1.1' stroke-linejoin='round'%3E%3Cpath d='M0 0V56H320' stroke-width='.8'/%3E%3Cpath d='M0 6L8 11L16 18L24 22L32 25L40 29L48 34L56 35L64 36L72 35L80 37L88 37L96 37L104 37L112 38L120 40L128 40L136 40L144 40L152 39L160 39L168 40L176 40L184 41L192 41L200 39L208 40L216 40L224 40L232 39L240 40L248 39L256 41L264 41L272 40L280 40L288 41L296 40L304 41L312 41L320 40'/%3E%3Cpath d='M0 10L8 16L16 20L24 23L32 27L40 32L48 32L56 34L64 38L72 38L80 40L88 41L96 41L104 44L112 42L120 43L128 43L136 45L144 44L152 44L160 46L168 45L176 45L184 46L192 45L200 45L208 45L216 46L224 46L232 45L240 45L248 45L256 46L264 45L272 46L280 47L288 47L296 46L304 47L312 45L320 46'/%3E%3Cpath d='M0 14L8 22L16 26L24 33L32 35L40 39L48 39L56 40L64 43L72 43L80 45L88 48L96 46L104 46L112 47L120 47L128 50L136 49L144 49L152 48L160 51L168 49L176 49L184 49L192 49L200 49L208 50L216 49L224 49L232 50L240 49L248 51L256 49L264 50L272 50L280 50L288 51L296 50L304 50L312 50L320 49'/%3E%3Cpath d='M0 4L8 6L16 13L24 15L32 16L40 16L48 19L56 21L64 22L72 23L80 27L88 25L96 26L104 30L112 29L120 31L128 30L136 32L144 31L152 32L160 32L168 32L176 31L184 32L192 33L200 34L208 34L216 33L224 33L232 34L240 34L248 34L256 34L264 34L272 34L280 33L288 34L296 35L304 33L312 35L320 35'/%3E%3C/svg%3E") no-repeat 0 0/100% 100%;
+}
+
+@media print{
+  body::after,.cbar,.sheet::after{display:none;}
+  figcaption .q{color:#444;}
+  .tag[data-k]{color:#000;border-color:#999;}
 }

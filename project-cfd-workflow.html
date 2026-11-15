@@ -20,7 +20,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="canonical" href="https://dulvinbandara.com/project-cfd-workflow.html">
 <meta name="author" content="Dulvin Bandara">
@@ -95,11 +95,11 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
           <div class="gstage">
             <figure class="gslide">
               <img src="images/gallery/Project2/temperaturesweep.webp" alt="Temperature Slice through the Accumulator, showing the temperature distribution" width="1800" height="985" decoding="async">
-              <figcaption>Temperature Slice through the Accumulator, showing the temperature distribution.</figcaption>
+              <figcaption><span class="q"><!-- plot title: quantity (units), location. Dulvin to supply. --></span>Temperature Slice through the Accumulator, showing the temperature distribution.</figcaption>
             </figure>
             <figure class="gslide">
               <img src="images/gallery/Project2/cptinlethole.webp" alt="CpT of the inlet hole into the monocoque, showing the flow distribution" width="907" height="812" loading="lazy" decoding="async">
-              <figcaption>CpT of the inlet hole into the monocoque, showing the flow distribution.</figcaption>
+              <figcaption><span class="q"><!-- plot title: quantity (units), location. Dulvin to supply. --></span>CpT of the inlet hole into the monocoque, showing the flow distribution.</figcaption>
             </figure>
             <figure class="gslide">
               <img src="images/gallery/Project2/postproduct.webp" alt="Post-Pro of the internal ducting" width="742" height="520" loading="lazy" decoding="async">
@@ -107,7 +107,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
             </figure>
             <figure class="gslide">
               <img src="images/gallery/Project2/velocitysweep.webp" alt="Velocity Sweep through the Accumulator" width="1450" height="606" loading="lazy" decoding="async">
-              <figcaption>Velocity Sweep through the Accumulator.</figcaption>
+              <figcaption><span class="q"><!-- plot title: quantity (units), location. Dulvin to supply. --></span>Velocity Sweep through the Accumulator.</figcaption>
             </figure>
           </div>
         </div>
@@ -186,20 +186,17 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
             <tr><th scope="col"></th><th scope="col">x</th><th scope="col">y</th><th scope="col">z</th></tr>
           </thead>
           <tbody>
-            <tr><th scope="row">Rad fan</th><td class="m1">0.269</td><td class="m0">0.000</td><td class="m1">&minus;0.147</td></tr>
-            <tr><th scope="row">Akku fan 1</th><td class="m3">&minus;2.236</td><td class="m0">0.100</td><td class="m1">&minus;0.236</td></tr>
-            <tr><th scope="row">Akku fan 2</th><td class="m3">&minus;2.036</td><td class="m0">0.000</td><td class="m1">&minus;0.336</td></tr>
-            <tr><th scope="row">Akku fan 3</th><td class="m3">&minus;2.136</td><td class="m0">0.000</td><td class="m1">&minus;0.336</td></tr>
-            <tr><th scope="row">RBH fan</th><td class="m4">&minus;9.918</td><td class="m1">&minus;0.300</td><td class="m0">0.075</td></tr>
+            <tr><th scope="row">Rad fan</th><td class="pos m1">0.269</td><td class="m0">0.000</td><td class="neg m1">&minus;0.147</td></tr>
+            <tr><th scope="row">Akku fan 1</th><td class="neg m3">&minus;2.236</td><td class="m0">0.100</td><td class="neg m1">&minus;0.236</td></tr>
+            <tr><th scope="row">Akku fan 2</th><td class="neg m3">&minus;2.036</td><td class="m0">0.000</td><td class="neg m1">&minus;0.336</td></tr>
+            <tr><th scope="row">Akku fan 3</th><td class="neg m3">&minus;2.136</td><td class="m0">0.000</td><td class="neg m1">&minus;0.336</td></tr>
+            <tr><th scope="row">RBH fan</th><td class="neg m4">&minus;9.918</td><td class="neg m1">&minus;0.300</td><td class="m0">0.075</td></tr>
           </tbody>
         </table>
 
         <p class="dlegend">
-          <span><span class="sw m0"></span>&lt;0.1</span>
-          <span><span class="sw m1"></span>0.1&ndash;0.5</span>
-          <span><span class="sw m2"></span>0.5&ndash;2</span>
-          <span><span class="sw m3"></span>2&ndash;5</span>
-          <span><span class="sw m4"></span>&gt;5</span>
+          <span class="scale" aria-hidden="true"><span class="end">&minus;</span><span class="sw neg m4"></span><span class="sw neg m3"></span><span class="sw neg m2"></span><span class="sw neg m1"></span><span class="sw m0"></span><span class="sw pos m1"></span><span class="sw pos m2"></span><span class="sw pos m3"></span><span class="sw pos m4"></span><span class="end">+</span></span>
+          <span>Steps at |0.1|, |0.5|, |2| and |5|&nbsp;mm</span>
         </p>
 
         <p>
@@ -246,7 +243,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 
         <figure class="plate">
           <img src="images/fluentcontour.webp" alt="Fluent contour of the accumulator cooling ducting, showing the fan boundary condition" width="1800" height="627" loading="lazy" decoding="async">
-          <figcaption>Fluent contour of the accumulator cooling ducting.</figcaption>
+          <figcaption><span class="q"><!-- plot title: quantity (units), location. Dulvin to supply. --></span>Fluent contour of the accumulator cooling ducting.</figcaption>
         </figure>
 
         <h3>Migrating to PyFluent</h3>
@@ -350,5 +347,6 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 <script src="gallery.js" defer></script>
 <script src="lightbox.js" defer></script>
 <script src="reveal.js" defer></script>
+<script src="cbar.js" defer></script>
 </body>
 </html>
