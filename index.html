@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dulvin Bandara — Aerodynamics &amp; Thermal CFD</title>
+<title>Dulvin Bandara | Aerodynamics &amp; Thermal CFD</title>
 <meta name="description" content="Aerodynamics and thermal cooling CFD at Monash Motorsport. Python simulation tooling, machine-learning surrogates, ducting design and internal flow management for Formula Student.">
 
 <meta name="theme-color" content="#F1EFEA" data-light="#F1EFEA" data-dark="#07080A">
@@ -21,7 +21,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261115j">
+<link rel="stylesheet" href="style.css?v=20261115l">
 <link rel="canonical" href="https://dulvinbandara.com/">
 <meta name="author" content="Dulvin Bandara">
 
@@ -30,16 +30,16 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 <meta property="og:url" content="https://dulvinbandara.com/">
 <meta property="og:title" content="Dulvin Bandara · Aerodynamics &amp; Thermal CFD">
 <meta property="og:description" content="Accumulator cooling ducting and CFD at Monash Motorsport. Simulation workflows, internal flow management, and aero-thermal integration for Formula Student.">
-<meta property="og:image" content="https://dulvinbandara.com/images/og/home.jpg">
+<meta property="og:image" content="https://dulvinbandara.com/images/og/home.jpg?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Isometric view of the accumulator cooling ducting">
+<meta property="og:image:alt" content="A 3D scan of Dulvin Bandara's head with velocity streamlines flowing around it">
 <meta property="og:locale" content="en_AU">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Dulvin Bandara · Aerodynamics &amp; Thermal CFD">
 <meta name="twitter:description" content="Accumulator cooling ducting and CFD at Monash Motorsport.">
-<meta name="twitter:image" content="https://dulvinbandara.com/images/og/home.jpg">
+<meta name="twitter:image" content="https://dulvinbandara.com/images/og/home.jpg?v=2">
 </head>
 <body>
 
@@ -72,7 +72,6 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
     <button class="tb" type="button" data-i="mesh" data-act="mesh" aria-pressed="true" title="Show or hide the surface mesh">Mesh</button>
     <button class="tb" type="button" data-i="lines" data-act="lines" aria-pressed="true" title="Show or hide the streamlines">Streamlines</button>
     <button class="tb" type="button" data-i="colour" data-act="colour" aria-pressed="true" title="Show or hide the scan's colours on the surface">Colour</button>
-    <button class="tb" type="button" data-i="contour" data-act="contour" aria-pressed="true" title="Show or hide the thermal contour behind the head">Contour</button>
     <button class="tb" type="button" data-i="remesh" data-act="remesh" title="Replay the mesh and streamline build">Regenerate</button>
   </div>
   <div class="tb-group" data-group="view" hidden><span class="tb-label">View</span>
@@ -87,6 +86,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
       <li class="tgroup"><span class="tlabel">Setup</span>
         <ul>
           <li><a href="index.html" aria-current="page">Overview</a></li>
+          <li><a href="about-build.html">About This Build</a></li>
         </ul>
       </li>
       <li class="tgroup"><span class="tlabel">Cases</span>
@@ -148,7 +148,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
   </div>
 
   <div class="pw">
-    <canvas class="flowcanvas" data-src="models/head-flow.bin?v=20261115j" role="img"
+    <canvas class="flowcanvas" data-src="models/head-flow.bin?v=20261115l" role="img"
             aria-label="A 3D scan of Dulvin's head drawn as a surface mesh, with streamlines flowing around it"></canvas>
   </div>
 
@@ -172,7 +172,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
     <h2 class="rowlabel">Focus</h2>
     <div>
       <p>Within Monash Motorsport I work primarily on the simulation side of the
-        Aerodynamics and Cooling subsections — building the CFD pipeline, setting up
+        Aerodynamics and Cooling subsections: building the CFD pipeline, setting up
         boundary conditions and mass flow rates, and validating designs against
         analytical targets. My strongest area is CFD development: scripted, repeatable
         workflows on HPC that cut the manual setup time each simulation campaign
@@ -259,7 +259,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
         </div>
       </a>
 
-      <!-- FILM CARD — hidden until the page has real content.
+      <!-- FILM CARD: hidden until the page has real content.
            Uncomment this block to publish it.
 
       <a class="projlink" href="project-film.html">
@@ -328,10 +328,10 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
   <span class="sb-bar"><i></i></span>
 </div>
 
-<script src="theme.js?v=20261115j" defer></script>
-<script src="reveal.js?v=20261115j" defer></script>
-<script src="cbar.js?v=20261115j" defer></script>
-<script src="flow.js?v=20261115j" defer></script>
-<script src="shell.js?v=20261115j" defer></script>
+<script src="theme.js?v=20261115l" defer></script>
+<script src="reveal.js?v=20261115l" defer></script>
+<script src="cbar.js?v=20261115l" defer></script>
+<script src="flow.js?v=20261115l" defer></script>
+<script src="shell.js?v=20261115l" defer></script>
 </body>
 </html>

@@ -31,7 +31,7 @@
     try {
       localStorage.setItem('theme', next);
     } catch (e) {
-      /* private mode — the choice just won't persist */
+      /* private mode: the choice just won't persist */
     }
     label();
   });

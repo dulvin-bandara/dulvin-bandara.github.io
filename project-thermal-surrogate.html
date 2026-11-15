@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Surrogate Thermal Model: Gaussian Process and Transient Network — Dulvin Bandara</title>
+<title>Surrogate Thermal Model: Gaussian Process and Transient Network | Dulvin Bandara</title>
 <meta name="description" content="A Gaussian process surrogate trained on full-car CFD, coupled to a 120-cell transient thermal network in Python. Held-out R² of 0.9932, verified fourth-order integration, tested and documented.">
 
 <meta name="theme-color" content="#FAF9F6">
@@ -21,7 +21,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261115j">
+<link rel="stylesheet" href="style.css?v=20261115l">
 <link rel="canonical" href="https://dulvinbandara.com/project-thermal-surrogate.html">
 <meta name="author" content="Dulvin Bandara">
 
@@ -30,21 +30,21 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 <meta property="og:url" content="https://dulvinbandara.com/project-thermal-surrogate.html">
 <meta property="og:title" content="Surrogate Thermal Model: Gaussian Process and Transient Network">
 <meta property="og:description" content="A Gaussian process surrogate trained on full-car CFD, coupled to a 120-cell transient thermal network. Python, scikit-learn, pytest.">
-<meta property="og:image" content="https://dulvinbandara.com/images/og/home.jpg">
+<meta property="og:image" content="https://dulvinbandara.com/images/og/home.jpg?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Isometric view of the accumulator cooling ducting">
+<meta property="og:image:alt" content="A 3D scan of Dulvin Bandara's head with velocity streamlines flowing around it">
 <meta property="og:locale" content="en_AU">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Surrogate Thermal Model: Gaussian Process and Transient Network">
 <meta name="twitter:description" content="Machine-learning surrogate and transient thermal model for the M26 accumulator at Monash Motorsport.">
-<meta name="twitter:image" content="https://dulvinbandara.com/images/og/home.jpg">
+<meta name="twitter:image" content="https://dulvinbandara.com/images/og/home.jpg?v=2">
 </head>
 <body>
 
 <!-- ======================================================================
-     DRAFT — written from the report and the repository README for you to
+     DRAFT: written from the report and the repository README for you to
      finalise. Every number on this page is taken from the report; nothing
      is invented. Comments marked "DRAFT NOTE" are prompts for you and can
      be deleted once dealt with. Search this file for "DRAFT NOTE".
@@ -87,6 +87,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
       <li class="tgroup"><span class="tlabel">Setup</span>
         <ul>
           <li><a href="index.html">Overview</a></li>
+          <li><a href="about-build.html">About This Build</a></li>
         </ul>
       </li>
       <li class="tgroup"><span class="tlabel">Cases</span>
@@ -121,7 +122,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 <header class="masthead">
   <h1>Surrogate <br>Thermal Model</h1>
   <p class="role">A Gaussian process trained on full-car CFD, feeding a transient thermal
-    network — accumulator cell temperatures from vehicle attitude, without another
+    network: accumulator cell temperatures from vehicle attitude, without another
     6.5-hour simulation.</p>
   <div class="contact">
     <span>Monash Motorsport</span>
@@ -136,6 +137,12 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
     <h2 class="rowlabel">Project 01</h2>
     <div>
       <div class="entry">
+
+        <dl class="brief">
+          <div><dt>Problem</dt><dd>Cooling air to the accumulator changes with speed and ride height, and one full-car CFD case takes about 6.5&nbsp;hours, so the design space cannot be swept directly.</dd></div>
+          <div><dt>Approach</dt><dd>A Gaussian process surrogate trained on 34 full-car CFD cases, feeding a 120-cell transient thermal network in Python, with unit tests and API docs.</dd></div>
+          <div><dt>Result</dt><dd>Held-out R² of 0.9932 with all 8 held-out cases inside the ±2σ band, and fourth-order time integration verified at 4.008.</dd></div>
+        </dl>
 
         <!-- DRAFT NOTE: the GitHub link below returned "not found" when checked without
              a login, so the repository is currently private. Make it public (or swap the
@@ -153,6 +160,31 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
           <div class="fig"><span class="val">4.008</span><span class="cap">Observed order of accuracy, against a theoretical 4</span></div>
         </div>
 
+        <h3 id="demo">Try the Surrogate</h3>
+        <p>
+          This is the fitted Gaussian process itself, exported from the repository and
+          evaluated in your browser: the same kernel, the same 26 training cases, the same
+          weights. Move the sliders. Mass flow is normalised, so 1.00 is the largest value in
+          the sweep; the absolute figures are team data and stay out of it.
+        </p>
+        <div class="gpdemo" data-src="data/surrogate-gp.json" hidden>
+          <div class="gp-controls">
+            <label>Velocity <output></output><input type="range" aria-label="Velocity, metres per second"></label>
+            <label>Front ride height <output></output><input type="range" aria-label="Front ride height, millimetres"></label>
+            <label>Rear ride height <output></output><input type="range" aria-label="Rear ride height, millimetres"></label>
+          </div>
+          <div class="gp-read" aria-live="polite">
+            <span class="gp-cap">Predicted mass flow, normalised</span>
+            <span class="gp-val">0.000</span>
+            <span class="gp-band"></span>
+            <span class="gp-state"></span>
+          </div>
+          <canvas class="gp-plot" role="img" aria-label="Predicted normalised mass flow against velocity at the chosen ride heights, with a two-sigma band and the CFD cases"></canvas>
+          <p class="gp-key"><span class="k-line">Prediction and ±2σ band at these ride heights</span><span class="k-train">Training CFD case</span><span class="k-test">Held-out CFD case</span><span class="k-range">Sampled range</span></p>
+          <p class="meta">The CFD cases sit at their own ride heights, so they scatter around the curve rather than on it. Past the shaded range the band widens: that is the model saying it has no data there.</p>
+        </div>
+        <noscript><p class="meta">The interactive surrogate needs JavaScript. The plots below show the same model.</p></noscript>
+
         <h3 id="why">Why a Surrogate?</h3>
 
         <!-- DRAFT NOTE: this section is the "so what". If you want one paragraph in your
@@ -161,13 +193,13 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
           The M26 sidepod ducting takes its cooling air from the external aerodynamics, so the
           air reaching the accumulator changes with speed and ride height. Nobody on the team
           could say by how much. A full-car CFD case takes roughly 6.5&nbsp;hours on 16&nbsp;cores
-          and 180&nbsp;GB of RAM, so a three-variable design space cannot be swept directly — and
+          and 180&nbsp;GB of RAM, so a three-variable design space cannot be swept directly, and
           a steady solution cannot return a transient cell temperature at all.
         </p>
 
         <p>
           This project replaces that sweep with a model. It takes the three things a vehicle
-          dynamicist controls — velocity, front ride height and rear ride height — and returns
+          dynamicist controls (velocity, front ride height and rear ride height) and returns
           the thing a thermal engineer needs: cell temperatures over a 40-minute endurance
           event, with an uncertainty attached.
         </p>
@@ -262,7 +294,7 @@ result.margin(333.15)       # K, against the 60 °C rules limit</code></pre>
           Second, the uncertainty is honest about its own limits. The held-out error sits
           between the fitted noise floor and the scatter between near-identical CFD cases,
           which is where a model that is not over-fitting should sit. And 8 of 8 inside a 95%
-          band is consistent with good calibration but cannot prove it — at 8 samples the
+          band is consistent with good calibration but cannot prove it: at 8 samples the
           expected count is 7.6, so an over-cautious model would score the same.
         </p>
 
@@ -384,7 +416,7 @@ result.margin(333.15)       # K, against the 60 °C rules limit</code></pre>
         <h3 id="software">Built to Be Rerun</h3>
 
         <!-- DRAFT NOTE: this is the section most relevant to a software role. Add anything
-             true that is missing — e.g. how long a full prediction takes to run, or how the
+             true that is missing, e.g. how long a full prediction takes to run, or how the
              PyFluent sweep tooling was structured. -->
         <p>
           The model is an installable Python package, <code translate="no">accumulatorThermal</code>,
@@ -425,6 +457,50 @@ result.margin(333.15)       # K, against the 60 °C rules limit</code></pre>
           assistance and adapted by me. The full declaration is in the repository’s AI use
           log.</p>
 
+
+
+        <h3 id="code">Read the Code</h3>
+        <p>
+          Two short excerpts, unedited apart from trimming the docstrings. The first is from
+          <code translate="no">surrogate.py</code>: a Gaussian process will answer anywhere, so
+          the model says when it is being asked outside its data. The second is one of the
+          verification tests, written after an earlier version of the correlation jumped at the
+          transition and quietly cost the integrator its order of accuracy.
+        </p>
+<pre class="code" translate="no" tabindex="0" aria-label="Excerpt from surrogate.py: flagging extrapolation"><code>def isExtrapolating(self, points: np.ndarray) -&gt; np.ndarray:
+    """
+    Flags design points lying outside the training range.
+
+    A Gaussian process returns a prediction anywhere, with a wide uncertainty band far from
+    the data. This makes the condition explicit so a caller can refuse to act on an
+    extrapolated value rather than quietly reporting one.
+    """
+    if self.bounds is None:
+        raise RuntimeError("surrogate must be fitted first")
+
+    points = np.atleast_2d(np.asarray(points, dtype=float))
+    below = np.any(points &lt; self.bounds[0], axis=1)
+    above = np.any(points &gt; self.bounds[1], axis=1)
+    return below | above</code></pre>
+<pre class="code" translate="no" tabindex="0" aria-label="Excerpt from the test suite: continuity of the Nusselt correlation"><code>def testNusseltIsContinuousAcrossTheTransitionBand():
+    """
+    No discontinuity at Re = 2300 or 4000, which would degrade the integrator's order.
+
+    A step at either boundary would make the right-hand side of the thermal network
+    discontinuous, and an integrator cannot achieve its formal order of accuracy across a
+    discontinuity, so the observed order of 4.008 depends on this holding. An earlier
+    implementation jumped by roughly 65 per cent at Re = 4000.
+    """
+    prandtl = AirProperties().prandtlNumber()
+
+    for correlation in (gnielinski, dittusBoelter):
+        for threshold in (RE_LAMINAR, RE_TURBULENT):
+            below = correlation(threshold - 0.1, prandtl)
+            above = correlation(threshold + 0.1, prandtl)
+            assert below == pytest.approx(above, rel=0.01), (
+                f"{correlation.__name__} jumps from {below:.3f} to {above:.3f} "
+                f"across Re = {threshold}"
+            )</code></pre>
       </div>
     </div>
   </div>
@@ -455,10 +531,11 @@ result.margin(333.15)       # K, against the 60 °C rules limit</code></pre>
   <span class="sb-bar"><i></i></span>
 </div>
 
-<script src="theme.js?v=20261115j" defer></script>
-<script src="lightbox.js?v=20261115j" defer></script>
-<script src="reveal.js?v=20261115j" defer></script>
-<script src="cbar.js?v=20261115j" defer></script>
-<script src="shell.js?v=20261115j" defer></script>
+<script src="theme.js?v=20261115l" defer></script>
+<script src="lightbox.js?v=20261115l" defer></script>
+<script src="reveal.js?v=20261115l" defer></script>
+<script src="cbar.js?v=20261115l" defer></script>
+<script src="surrogate.js?v=20261115l" defer></script>
+<script src="shell.js?v=20261115l" defer></script>
 </body>
 </html>
