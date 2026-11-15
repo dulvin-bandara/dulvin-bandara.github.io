@@ -4,7 +4,7 @@
      header  "FLOW", nVerts, nTris, nLines, ptsPerLine, range
      Int16   vertex positions      Int8  vertex normals
      Uint16  triangle indices      Int16 streamline points
-     Uint8   streamline speed
+     Uint8   streamline speed      Uint8 wake weight
    Sequence: the surface cells sweep in from the crown down, as
    if the mesher were running, then the streamlines grow from
    the inlet and keep advecting.
@@ -40,10 +40,11 @@
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* inferno stops; each theme samples the half that reads on its ground */
+  /* velocity colour map, low to high: blue, cyan, green, yellow, red.
+     The light theme takes slightly deeper stops so they hold on paper. */
   var RAMP = {
-    light: ['#10092d', '#2f0a5b', '#4a0c6b', '#6b176e', '#8c2369', '#c33b4f', '#eb6628'],
-    dark:  ['#6b176e', '#8c2369', '#c33b4f', '#eb6628', '#fca50a', '#f7d03c', '#f2ea69']
+    light: ['#1230c8', '#0b78dc', '#0aa9a6', '#1fa83c', '#b3b80e', '#ee8a0a', '#d8201a'],
+    dark:  ['#2748ff', '#1f9bff', '#17dcd4', '#3fe05a', '#d9ea2a', '#ffad1a', '#ff3a26']
   };
 
   function hex(h) {
@@ -76,10 +77,15 @@
     '  else { vec3 c = mix(uInk, uHot, front); gl_FragColor = vec4(c, mix(0.34 + 0.3 * vL, 1.0, front)); } }';
 
   var LINE_VS =
-    'attribute vec3 aPos; attribute vec3 aTan; attribute vec4 aInfo;' +   // info: t, speed, side, phase
-    'uniform mat4 uMVP; uniform vec2 uPx; uniform float uWidth;' +
+    'attribute vec3 aPos; attribute vec3 aTan; attribute vec4 aInfo; attribute float aWake;' +   // info: t, speed, side, phase
+    'uniform mat4 uMVP; uniform vec2 uPx; uniform float uWidth; uniform mediump float uTime;' +
     'varying float vT; varying float vS; varying float vPh; varying float vEdge;' +
-    'void main(){ vec4 p = uMVP * vec4(aPos, 1.0); vec4 q = uMVP * vec4(aPos + aTan * 0.02, 1.0);' +
+    'void main(){ vec3 P = aPos;' +
+    // the wake is unsteady: lines in it sway, more the further downstream
+    '  float sw = aWake * 0.07 * smoothstep(0.0, 2.5, -aPos.z);' +
+    '  P.x += sw * sin(uTime * 1.3 + aInfo.w * 6.283 + aPos.z * 2.4);' +
+    '  P.y += sw * cos(uTime * 1.0 + aInfo.w * 4.1 + aPos.z * 2.0);' +
+    '  vec4 p = uMVP * vec4(P, 1.0); vec4 q = uMVP * vec4(P + aTan * 0.02, 1.0);' +
     '  vec2 d = normalize((q.xy / q.w - p.xy / p.w) / uPx + vec2(1e-5));' +
     '  vec2 n = vec2(-d.y, d.x);' +
     '  p.xy += n * aInfo.z * uWidth * uPx * p.w;' +
@@ -99,12 +105,13 @@
     '  float head = uGrow * 1.25 - vPh * 0.25;' +            // each line starts a little apart
     '  if (vT > head) discard;' +
     '  float tip = 1.0 - smoothstep(0.0, 0.06, head - vT);' +
-    '  float pulse = fract(vT * 2.2 - uTime * (0.10 + 0.06 * vS) + vPh);' +
-    '  float glow = smoothstep(0.80, 1.0, pulse);' +
+    '  float pulse = fract(vT * 2.6 - uTime * (0.05 + 0.16 * vS) + vPh);' +   // faster where the flow is faster
+    '  float glow = smoothstep(0.78, 1.0, pulse);' +
     '  float ends = smoothstep(0.0, 0.10, vT) * (1.0 - smoothstep(0.88, 1.0, vT));' +
-    '  float soft = 1.0 - abs(vEdge);' +
-    '  float a = (0.34 + 0.66 * max(glow, tip * step(uGrow, 0.999))) * ends * uAlpha * (0.45 + 0.55 * soft);' +
-    '  gl_FragColor = vec4(ramp(vS + 0.22 * glow), a); }';
+    '  float soft = 1.0 - smoothstep(0.55, 1.0, abs(vEdge));' +                // crisp body, soft rim
+    '  float lit = max(glow, tip * step(uGrow, 0.999));' +
+    '  float a = (0.72 + 0.28 * lit) * ends * uAlpha * soft;' +
+    '  gl_FragColor = vec4(mix(ramp(vS), vec3(1.0), 0.30 * lit), a); }';
 
   function program(vs, fs) {
     function sh(type, src) {
@@ -169,7 +176,7 @@
     }
     var qpos = take(Int16Array, nV * 3), qnrm = take(Int8Array, nV * 3);
     var idx = take(Uint16Array, nT * 3);
-    var qline = take(Int16Array, nL * P * 3), qspd = take(Uint8Array, nL * P);
+    var qline = take(Int16Array, nL * P * 3), qspd = take(Uint8Array, nL * P), qwake = take(Uint8Array, nL * P);
 
     var pos = new Float32Array(nV * 3), nrm = new Float32Array(nV * 3), i;
     for (i = 0; i < nV * 3; i++) { pos[i] = qpos[i] / 32767 * range; nrm[i] = qnrm[i] / 127; }
@@ -184,7 +191,7 @@
 
     // streamlines as ribbons: two vertices per point, offset in the vertex shader
     var lp = new Float32Array(nL * P * 2 * 3), lt = new Float32Array(nL * P * 2 * 3);
-    var li = new Float32Array(nL * P * 2 * 4), lidx = new Uint16Array(nL * (P - 1) * 6);
+    var li = new Float32Array(nL * P * 2 * 4), lw = new Float32Array(nL * P * 2), lidx = new Uint16Array(nL * (P - 1) * 6);
     var w = 0;
     for (var l = 0; l < nL; l++) {
       var phase = (l * 0.6180339887) % 1;
@@ -201,6 +208,7 @@
           li[v * 4 + 1] = qspd[l * P + k] / 255;
           li[v * 4 + 2] = s ? 1 : -1;
           li[v * 4 + 3] = phase;
+          lw[v] = qwake[l * P + k] / 255;
         }
         if (k < P - 1) {
           var v0 = (l * P + k) * 2;
@@ -222,7 +230,7 @@
       pos: buffer(gl.ARRAY_BUFFER, pos), nrm: buffer(gl.ARRAY_BUFFER, nrm),
       tri: buffer(gl.ELEMENT_ARRAY_BUFFER, idx), nTri: nT * 3,
       edge: buffer(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(edges)), nEdge: edges.length,
-      lp: buffer(gl.ARRAY_BUFFER, lp), lt: buffer(gl.ARRAY_BUFFER, lt), li: buffer(gl.ARRAY_BUFFER, li),
+      lp: buffer(gl.ARRAY_BUFFER, lp), lt: buffer(gl.ARRAY_BUFFER, lt), li: buffer(gl.ARRAY_BUFFER, li), lw: buffer(gl.ARRAY_BUFFER, lw),
       lidx: buffer(gl.ELEMENT_ARRAY_BUFFER, lidx), nLine: lidx.length,
       top: 1.06, bottom: -1.06
     };
@@ -240,7 +248,7 @@
     colors.ink = dark ? [1, 1, 1] : hex('#11151A');
     colors.hot = hex(dark ? '#fca50a' : '#c33b4f');
     colors.shade = dark ? 0.16 : 0.10;
-    colors.alpha = dark ? 0.95 : 0.9;
+    colors.alpha = dark ? 0.95 : 0.92;
     var r = RAMP[dark ? 'dark' : 'light'], flat = [];   // local: the ramp as one float list
     r.forEach(function (h) { flat = flat.concat(hex(h)); });
     colors.ramp = new Float32Array(flat);
@@ -351,14 +359,14 @@
       project(d.line[i * 3] / 32767 * d.range, d.line[i * 3 + 1] / 32767 * d.range, d.line[i * 3 + 2] / 32767 * d.range, lp, i * 3);
     }
     function lines(front) {
-      c.lineWidth = W < 620 ? 1.1 : 1.5;
+      c.lineWidth = W < 620 ? 1.8 : 2.6;
       c.lineCap = 'round';
       for (var l = 0; l < d.nL; l++) {
         for (var k = 0; k < d.P - 1; k++) {
           var a = (l * d.P + k) * 3, b = a + 3;
           if (((lp[a + 2] + lp[b + 2]) / 2 < cam.dist) !== front) continue;
           var t = k / (d.P - 1), ends = Math.min(1, t / 0.1) * Math.min(1, (1 - t) / 0.12);
-          c.strokeStyle = 'rgba(' + rampAt(d.spd[l * d.P + k] / 255) + ',' + (0.62 * ends * colors.alpha).toFixed(3) + ')';
+          c.strokeStyle = 'rgba(' + rampAt(d.spd[l * d.P + k] / 255) + ',' + (0.85 * ends * colors.alpha).toFixed(3) + ')';
           c.beginPath(); c.moveTo(lp[a], lp[a + 1]); c.lineTo(lp[b], lp[b + 1]); c.stroke();
         }
       }
@@ -441,7 +449,7 @@
       gl.useProgram(s.line);
       gl.uniformMatrix4fv(u(s.line, 'uMVP'), false, new Float32Array(mvp));
       gl.uniform2f(u(s.line, 'uPx'), 2 / view.w, 2 / view.h);
-      gl.uniform1f(u(s.line, 'uWidth'), view.w < 620 ? 0.9 : 1.15);
+      gl.uniform1f(u(s.line, 'uWidth'), view.w < 620 ? 1.4 : 1.9);
       gl.uniform3fv(u(s.line, 'uRamp[0]'), colors.ramp);
       gl.uniform1f(u(s.line, 'uGrow'), grow);
       gl.uniform1f(u(s.line, 'uTime'), t);
@@ -450,9 +458,11 @@
       gl.bindBuffer(gl.ARRAY_BUFFER, s.lp); gl.enableVertexAttribArray(lP); gl.vertexAttribPointer(lP, 3, gl.FLOAT, false, 0, 0);
       gl.bindBuffer(gl.ARRAY_BUFFER, s.lt); gl.enableVertexAttribArray(lT); gl.vertexAttribPointer(lT, 3, gl.FLOAT, false, 0, 0);
       gl.bindBuffer(gl.ARRAY_BUFFER, s.li); gl.enableVertexAttribArray(lI); gl.vertexAttribPointer(lI, 4, gl.FLOAT, false, 0, 0);
+      var lW = gl.getAttribLocation(s.line, 'aWake');
+      gl.bindBuffer(gl.ARRAY_BUFFER, s.lw); gl.enableVertexAttribArray(lW); gl.vertexAttribPointer(lW, 1, gl.FLOAT, false, 0, 0);
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.lidx);
       gl.drawElements(gl.TRIANGLES, s.nLine, gl.UNSIGNED_SHORT, 0);
-      gl.disableVertexAttribArray(lT); gl.disableVertexAttribArray(lI);
+      gl.disableVertexAttribArray(lT); gl.disableVertexAttribArray(lI); gl.disableVertexAttribArray(lW);
     }
     gl.depthMask(true);
   }
