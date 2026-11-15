@@ -5,9 +5,8 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[scaled=0.95]{helvet}
-\renewcommand{\familydefault}{\sfdefault}
-\usepackage[a4paper,top=1.5cm,bottom=1.4cm,left=1.6cm,right=1.6cm]{geometry}
+\usepackage{lmodern}   % LaTeX's own Computer Modern, in its T1 form
+\usepackage[a4paper,top=1.25cm,bottom=1.1cm,left=1.5cm,right=1.5cm]{geometry}
 \usepackage{enumitem}
 \usepackage{microtype}
 \usepackage{xcolor}
@@ -19,6 +18,7 @@
   pdflang={en-AU}
 }
 \definecolor{link}{HTML}{1155CC}
+\definecolor{accent}{HTML}{B4432A}   % the site's accent, on section headings and rules
 
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
@@ -29,9 +29,9 @@
 
 % Section heading with a full-width rule under it
 \newcommand{\cvsection}[1]{%
-  \vspace{10pt}%
-  {\large\uppercase{#1}}\par
-  \vspace{2pt}\hrule height 1.1pt\vspace{3pt}}
+  \vspace{7pt}%
+  {\large\color{accent}\uppercase{#1}}\par
+  \vspace{2pt}{\color{accent}\hrule height 1.1pt}\vspace{3pt}}
 
 % Organisation (bold) with the location on the right
 \newcommand{\cvorg}[2]{\textbf{#1}\hfill #2\par}
@@ -55,15 +55,15 @@
 \begin{center}
   {\LARGE\bfseries Dulvin Hemsara Bandara}\par
   \vspace{4pt}
-  {\small
-  Melbourne, Australia\sep +61 433 513 867\sep dulvinb@gmail.com\sep
+  {\footnotesize
+  Melbourne, Australia\sep +61~433~513~867\sep dulvinb@gmail.com\sep
   \href{https://www.linkedin.com/in/dulvin-bandara-8b485725a}{\color{link}\underline{linkedin.com/in/dulvin-bandara-8b485725a}}\sep
   \href{https://dulvinbandara.com}{\color{link}\underline{dulvinbandara.com}}\par}
   \vspace{9pt}
   4th-year Aerospace Engineering and Commerce student at Monash University and current Senior Aerodynamics
   Engineer at Monash Motorsport, leading the Aerodynamics Cooling Subsection. Specialising in CFD workflow
   development with ANSYS Fluent, PyFluent \& MATLAB on HPC, alongside full-car external and thermal
-  aerodynamics. Seeking a 2027 Industrial Placement.\par
+  aerodynamics. Seeking a 2027--28 Industrial Placement.\par
 \end{center}
 
 \cvsection{Relevant Experience}
@@ -72,6 +72,8 @@
 \cvrole{}{Jan 2025 - Present}
 \begin{cvitems}
   \item Co-wrote a Git-powered PyFluent architecture on HPC, reducing overall runtime by 54\%.
+  \item Built a Gaussian process surrogate in Python (scikit-learn) from 34 full-car CFD cases to predict cooling
+        mass flow (held-out R\textsuperscript{2} of 0.9932), driving a 120-cell transient thermal model covered by pytest unit tests.
   \item Established workflow validation via mesh independence \& y+ value studies and turbulence model selections.
   \item Designed and validated internal and external ducting for accumulator cooling, increasing mass flow rates by
         400\% and targeting a 65\% peak cell temperature margin to rules.
@@ -79,8 +81,8 @@
         generating force, pressure, \& thermal contours for design reviews.
   \item Manufactured 2025 \& 2026 aerodynamics packages, with carbon lay-ups and jigging, producing 70 parts over
         the course of 2 years.
-  \item Developed onboarding programme for aerodynamics recruits; serving as first point of contact and mentor for
-        all new team members across their first few months in the team.
+  \item Built and led the onboarding programme for aerodynamics recruits, mentoring every new member through
+        their first months as their first point of contact.
 \end{cvitems}
 
 \cvorg{Australian Centre for Sports Aerodynamics}{South Australia}
@@ -103,7 +105,7 @@
 \cvsection{Education}
 
 \cvorg{Monash University}{Clayton, VIC}
-\cvrole{Bachelor of Aerospace Engineering (Honours) \& Bachelor of Commerce majoring in Finance}{Dec 2028}
+\cvrole{Bachelor of Aerospace Engineering (Honours) \& Bachelor of Commerce majoring in Finance}{Expected Dec 2028}
 
 \cvsection{Leadership \& Activities}
 
@@ -131,7 +133,7 @@
 \vspace{2pt}
 \cvskill{CFD \& Simulation:}{ANSYS Fluent, PyFluent, OpenFOAM (Basic), SU2 (Basic), Paraview}
 \cvskill{CAD:}{Siemens NX, SolidWorks, Fusion 360}
-\cvskill{Programming:}{Python, MATLAB, R, LaTeX, Git, HPC}
+\cvskill{Programming:}{Python (NumPy, scikit-learn, pytest), MATLAB, R, LaTeX, Git, HPC}
 \cvskill{Languages:}{English (native), Sinhalese (native), French (Conversational), Italian (Conversational)}
 \cvskill{Interests:}{Formula 1, Karting, Amateur Cricket, University Running and Volleyball Clubs}
 

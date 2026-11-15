@@ -21,7 +21,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261115i">
+<link rel="stylesheet" href="style.css?v=20261115j">
 <link rel="canonical" href="https://dulvinbandara.com/">
 <meta name="author" content="Dulvin Bandara">
 
@@ -72,6 +72,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
     <button class="tb" type="button" data-i="mesh" data-act="mesh" aria-pressed="true" title="Show or hide the surface mesh">Mesh</button>
     <button class="tb" type="button" data-i="lines" data-act="lines" aria-pressed="true" title="Show or hide the streamlines">Streamlines</button>
     <button class="tb" type="button" data-i="colour" data-act="colour" aria-pressed="true" title="Show or hide the scan's colours on the surface">Colour</button>
+    <button class="tb" type="button" data-i="contour" data-act="contour" aria-pressed="true" title="Show or hide the thermal contour behind the head">Contour</button>
     <button class="tb" type="button" data-i="remesh" data-act="remesh" title="Replay the mesh and streamline build">Regenerate</button>
   </div>
   <div class="tb-group" data-group="view" hidden><span class="tb-label">View</span>
@@ -147,7 +148,7 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
   </div>
 
   <div class="pw">
-    <canvas class="flowcanvas" data-src="models/head-flow.bin?v=20261115i" role="img"
+    <canvas class="flowcanvas" data-src="models/head-flow.bin?v=20261115j" role="img"
             aria-label="A 3D scan of Dulvin's head drawn as a surface mesh, with streamlines flowing around it"></canvas>
   </div>
 
@@ -327,10 +328,10 @@ if(m)m.setAttribute('content',m.getAttribute('data-'+t)||(t==='dark'?'#0E1114':'
   <span class="sb-bar"><i></i></span>
 </div>
 
-<script src="theme.js?v=20261115i" defer></script>
-<script src="reveal.js?v=20261115i" defer></script>
-<script src="cbar.js?v=20261115i" defer></script>
-<script src="flow.js?v=20261115i" defer></script>
-<script src="shell.js?v=20261115i" defer></script>
+<script src="theme.js?v=20261115j" defer></script>
+<script src="reveal.js?v=20261115j" defer></script>
+<script src="cbar.js?v=20261115j" defer></script>
+<script src="flow.js?v=20261115j" defer></script>
+<script src="shell.js?v=20261115j" defer></script>
 </body>
 </html>

@@ -87,6 +87,34 @@
     '    float a = mix(0.30 + 0.26 * vL, 0.07 + 0.09 * vL, inked * step(0.01, uTint));' +
     '    gl_FragColor = vec4(c, mix(a, 1.0, front)); } }';
 
+  /* A temperature field behind the head, drawn first as one full-canvas
+     quad: a warm halo round the head and a plume carried downstream, cut
+     into bands like a filled contour plot. Illustrative, like the flow. */
+  var HEAT_VS = 'attribute vec2 aXY; varying vec2 vXY; void main(){ vXY = aXY; gl_Position = vec4(aXY, 0.0, 1.0); }';
+  var HEAT_FS =
+    'precision mediump float;' +
+    'uniform vec3 uRamp[7]; uniform vec2 uC; uniform vec2 uDir; uniform float uR; uniform float uAspect;' +
+    'uniform float uTime; uniform float uAlpha; uniform float uLo;' +
+    'varying vec2 vXY;' +
+    'vec3 ramp(float x){ x = clamp(x, 0.0, 1.0) * 6.0; int i = int(floor(x)); float f = fract(x);' +
+    '  vec3 a = uRamp[0]; vec3 b = uRamp[1];' +
+    '  if (i == 1) { a = uRamp[1]; b = uRamp[2]; } else if (i == 2) { a = uRamp[2]; b = uRamp[3]; }' +
+    '  else if (i == 3) { a = uRamp[3]; b = uRamp[4]; } else if (i == 4) { a = uRamp[4]; b = uRamp[5]; }' +
+    '  else if (i >= 5) { a = uRamp[5]; b = uRamp[6]; }' +
+    '  return mix(a, b, f); }' +
+    'void main(){' +
+    '  vec2 p = (vXY - uC) * vec2(uAspect, 1.0) / uR;' +          // head radius = 1
+    '  float al = dot(p, uDir); float ac = dot(p, vec2(-uDir.y, uDir.x));' +
+    '  ac += 0.10 * sin(al * 1.6 - uTime * 0.5) * smoothstep(0.5, 3.0, al);' +   // the plume meanders slowly
+    '  float halo = exp(-dot(p, p) / 1.9);' +
+    '  float w = 0.85 + 0.22 * max(al, 0.0);' +
+    '  float plume = smoothstep(-0.4, 0.8, al) * exp(-ac * ac / (w * w)) / (1.0 + 0.30 * max(al, 0.0));' +
+    '  float T = max(halo, plume);' +
+    '  float n = 9.0; float band = floor(T * n) / n; float e = fract(T * n);' +
+    '  float edge = 1.0 - 0.35 * (1.0 - smoothstep(0.0, 0.10, e));' +            // a darker line at each level
+    '  float a = uAlpha * smoothstep(0.08, 0.30, T) * edge;' +
+    '  gl_FragColor = vec4(ramp(uLo + (0.97 - uLo) * band), a); }';
+
   var LINE_VS =
     'attribute vec3 aPos; attribute vec3 aTan; attribute vec4 aInfo; attribute float aWake;' +   // info: t, speed, side, phase
     'uniform mat4 uMVP; uniform vec2 uPx; uniform float uWidth; uniform mediump float uTime;' +
@@ -241,12 +269,13 @@
     }
     if (!gl) { use2d(); return; }
 
-    var mp, lpg;
-    try { mp = program(MESH_VS, MESH_FS); lpg = program(LINE_VS, LINE_FS); }
+    var mp, lpg, hp;
+    try { mp = program(MESH_VS, MESH_FS); lpg = program(LINE_VS, LINE_FS); hp = program(HEAT_VS, HEAT_FS); }
     catch (e) { use2d(); return; }
 
     scene = {
-      mesh: mp, line: lpg,
+      mesh: mp, line: lpg, heat: hp,
+      quad: buffer(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1])),
       pos: buffer(gl.ARRAY_BUFFER, pos), nrm: buffer(gl.ARRAY_BUFFER, nrm),
       col: qcol ? buffer(gl.ARRAY_BUFFER, qcol) : null,
       tri: buffer(gl.ELEMENT_ARRAY_BUFFER, idx), nTri: nT * 3,
@@ -271,6 +300,15 @@
     colors.shade = dark ? 0.16 : 0.10;
     colors.alpha = dark ? 0.95 : 0.92;
     colors.tint = dark ? 0.92 : 0.88;      // how far the cells take the scan's colour
+    // the thermal contour takes the site's inferno ramp, and stays faint
+    var heat = [];
+    [['--f-00', '#10092d'], ['--f-22', '#4a0c6b'], ['--f-38', '#8c2369'], ['--f-52', '#c33b4f'],
+     ['--f-66', '#eb6628'], ['--f-80', '#fca50a'], ['--f-94', '#f2ea69']].forEach(function (c) {
+      heat = heat.concat(cssColor(c[0], c[1]));
+    });
+    colors.heat = new Float32Array(heat);
+    colors.heatAlpha = dark ? 0.34 : 0.18;
+    colors.heatLo = dark ? 0.30 : 0.44;    // skip the ramp's near-black end, which reads as grey
     var r = RAMP[dark ? 'dark' : 'light'], flat = [];   // local: the ramp as one float list
     r.forEach(function (h) { flat = flat.concat(hex(h)); });
     colors.ramp = new Float32Array(flat);
@@ -352,7 +390,11 @@
     mv[14] = -dist;
     // shift after projection so perspective stays centred on the head
     var shift = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, offX, offY, 0, 1];
+    // where the head sits on screen, its radius, and which way is downstream
+    // (the model's -z axis as the camera sees it), for the thermal contour
+    var dx = -model[8], dy = -model[9], dl = Math.sqrt(dx * dx + dy * dy) || 1;
     return {
+      cx: offX, cy: offY, r: 1.05 * zoom * unitPx / (view.h / 2), dir: [dx / dl, dy / dl],
       mvp: mul(shift, mul(proj, mv)),
       rot: [model[0], model[1], model[2], model[4], model[5], model[6], model[8], model[9], model[10]],
       dist: dist
@@ -453,9 +495,33 @@
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
 
+    var u = function (p, n) { return gl.getUniformLocation(p, n); };
+
+    /* thermal contour, behind everything; it comes in with the colour */
+    if (tintIn > 0 && shown('contour')) {
+      gl.useProgram(s.heat);
+      gl.disable(gl.DEPTH_TEST);
+      gl.depthMask(false);
+      gl.enable(gl.BLEND);
+      gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+      gl.uniform3fv(u(s.heat, 'uRamp[0]'), colors.heat);
+      gl.uniform2f(u(s.heat, 'uC'), cam.cx, cam.cy);
+      gl.uniform2f(u(s.heat, 'uDir'), cam.dir[0], cam.dir[1]);
+      gl.uniform1f(u(s.heat, 'uR'), cam.r);
+      gl.uniform1f(u(s.heat, 'uAspect'), view.w / view.h);
+      gl.uniform1f(u(s.heat, 'uTime'), t);
+      gl.uniform1f(u(s.heat, 'uAlpha'), colors.heatAlpha * tintIn);
+      gl.uniform1f(u(s.heat, 'uLo'), colors.heatLo);
+      var hq = gl.getAttribLocation(s.heat, 'aXY');
+      gl.bindBuffer(gl.ARRAY_BUFFER, s.quad); gl.enableVertexAttribArray(hq); gl.vertexAttribPointer(hq, 2, gl.FLOAT, false, 0, 0);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      gl.disableVertexAttribArray(hq);
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthMask(true);
+    }
+
     /* surface */
     gl.useProgram(s.mesh);
-    var u = function (p, n) { return gl.getUniformLocation(p, n); };
     gl.uniformMatrix4fv(u(s.mesh, 'uMVP'), false, new Float32Array(mvp));
     gl.uniformMatrix3fv(u(s.mesh, 'uRot'), false, new Float32Array(rot));
     gl.uniform3fv(u(s.mesh, 'uGround'), colors.ground);
