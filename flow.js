@@ -82,9 +82,10 @@
     'varying float vT; varying float vS; varying float vPh; varying float vEdge;' +
     'void main(){ vec3 P = aPos;' +
     // the wake is unsteady: lines in it sway, more the further downstream
-    '  float sw = aWake * 0.07 * smoothstep(0.0, 2.5, -aPos.z);' +
-    '  P.x += sw * sin(uTime * 1.3 + aInfo.w * 6.283 + aPos.z * 2.4);' +
-    '  P.y += sw * cos(uTime * 1.0 + aInfo.w * 4.1 + aPos.z * 2.0);' +
+    '  float sw = aWake * smoothstep(0.0, 2.2, -aPos.z);' +
+    '  float ph = aInfo.w * 6.283;' +
+    '  P.x += sw * (0.11 * sin(uTime * 1.5 + ph + aPos.z * 2.3) + 0.06 * sin(uTime * 3.4 + ph * 2.3 + aPos.z * 5.6) + 0.03 * sin(uTime * 6.1 + ph * 3.1 + aPos.z * 11.0));' +
+    '  P.y += sw * (0.11 * cos(uTime * 1.2 + ph * 1.7 + aPos.z * 2.0) + 0.06 * cos(uTime * 2.9 + ph * 2.9 + aPos.z * 6.3) + 0.03 * cos(uTime * 5.3 + ph * 1.3 + aPos.z * 12.0));' +
     '  vec4 p = uMVP * vec4(P, 1.0); vec4 q = uMVP * vec4(P + aTan * 0.02, 1.0);' +
     '  vec2 d = normalize((q.xy / q.w - p.xy / p.w) / uPx + vec2(1e-5));' +
     '  vec2 n = vec2(-d.y, d.x);' +
