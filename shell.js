@@ -389,7 +389,7 @@
       var b = e.target.closest('button[data-act]');
       if (!b) return;
       switch (b.getAttribute('data-act')) {
-        case 'init': command('/solve/initialize'); initialize(); break;
+        case 'init': command('/solve/initialize'); initialize(); regenerate(); break;   // on the index, the build replays too
         case 'step': command('/solve/iterate 1'); iterate(); break;
         case 'run':
           if (solving) stopRun(); else { command('/solve/iterate 1000'); startRun(); }
@@ -466,7 +466,7 @@
         break;
       case 'run': case 'iterate': case 'solve': startRun(); break;
       case 'stop': case 'interrupt': stopRun(); break;
-      case 'init': case 'initialize': case 'top': initialize(); break;
+      case 'init': case 'initialize': case 'top': initialize(); regenerate(); break;
       case 'theme': case 'dark': case 'light':
         var tt = document.querySelector('.themetoggle');
         if (tt && verb !== root.getAttribute('data-theme')) tt.click();

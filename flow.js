@@ -6,9 +6,10 @@
      Uint16  triangle indices      Int16 streamline points
      Uint8   streamline speed      Uint8 wake weight
      Uint8   vertex colour, RGB (optional, from the scan's texture)
-   Sequence: the surface cells sweep in from the crown down, as
-   if the mesher were running, then the streamlines grow from
-   the inlet and keep advecting.
+   Sequence: the cell edges sweep in from the crown down, as if
+   the mesher were running; the scan's colour then drains down
+   over the cells and the edges fall back to a faint overlay;
+   then the streamlines grow from the inlet and keep advecting.
    Plain WebGL, no library. Without WebGL the canvas is hidden
    and the hero is just the wordmark. Under reduced motion one
    finished frame is drawn and nothing moves.
@@ -19,6 +20,9 @@
   if (!canvas) return;
   var hero = canvas.closest('.hero');
   var force2d = /[?&]flow=2d\b/.test(location.search);
+  // ?flowt=2.5 holds the build at that many seconds, for checking a stage
+  var held = (/[?&]flowt=([\d.]+)/.exec(location.search) || [])[1];
+  held = held === undefined ? null : parseFloat(held);
   var gl = force2d ? null : canvas.getContext('webgl', { antialias: true, alpha: true, premultipliedAlpha: false });
   var ctx2d = null;      // set when WebGL is unavailable: a still frame on a 2D canvas
   var flat = null;       // the geometry the 2D renderer needs
@@ -71,13 +75,17 @@
   var MESH_FS =
     'precision mediump float;' +
     'uniform vec3 uGround; uniform vec3 uInk; uniform vec3 uHot;' +
-    'uniform float uSweep; uniform float uMode; uniform float uShade; uniform float uTint;' +
+    'uniform float uSweep; uniform float uMode; uniform float uShade; uniform float uTint; uniform float uTintSweep;' +
     'varying float vY; varying float vL; varying vec3 vC;' +
     'void main(){ if (vY < uSweep) discard;' +
     '  float front = 1.0 - smoothstep(0.0, 0.16, vY - uSweep);' +
+    '  float inked = smoothstep(0.0, 0.45, vY - uTintSweep);' +      // 1 where the colour has arrived
     '  if (uMode < 0.5) { vec3 base = mix(uGround, uInk, uShade * (0.25 + 0.75 * vL));' +
-    '    gl_FragColor = vec4(mix(base, vC * (0.40 + 0.60 * vL), uTint), 1.0); }' +
-    '  else { vec3 c = mix(uInk, uHot, front); gl_FragColor = vec4(c, mix(0.34 + 0.3 * vL, 1.0, front)); } }';
+    '    gl_FragColor = vec4(mix(base, vC * (0.40 + 0.60 * vL), uTint * inked), 1.0); }' +
+    // edges: clear while the mesh builds, a faint overlay once the colour is in
+    '  else { vec3 c = mix(uInk, uHot, front);' +
+    '    float a = mix(0.30 + 0.26 * vL, 0.07 + 0.09 * vL, inked * step(0.01, uTint));' +
+    '    gl_FragColor = vec4(c, mix(a, 1.0, front)); } }';
 
   var LINE_VS =
     'attribute vec3 aPos; attribute vec3 aTan; attribute vec4 aInfo; attribute float aWake;' +   // info: t, speed, side, phase
@@ -405,10 +413,10 @@
     }
     Array.prototype.sort.call(order, function (a, b) { return depth[b] - depth[a]; });
     c.fillStyle = 'rgb(' + rgb(colors.ground) + ')';
-    c.strokeStyle = 'rgba(' + rgb(colors.ink) + ',' + (colors.dark ? 0.42 : 0.5) + ')';
+    var tinted = d.col && shown('colour');
+    c.strokeStyle = 'rgba(' + rgb(colors.ink) + ',' + (tinted ? 0.16 : colors.dark ? 0.36 : 0.42) + ')';
     c.lineWidth = 0.6;
     c.lineJoin = 'round';
-    var tinted = d.col && shown('colour');
     for (j = 0; shown('mesh') && j < d.nT; j++) {
       i = order[j] * 3;
       var p0 = d.idx[i] * 3, p1 = d.idx[i + 1] * 3, p2 = d.idx[i + 2] * 3;
@@ -428,11 +436,13 @@
 
   function draw() {
     var s = scene; if (!s) return;
-    var t = reduced ? 60 : clock;
+    var t = held !== null ? held : reduced ? 60 : clock;
 
-    var meshIn = Math.min(1, t / 2.4);                       // cells sweep in
+    var meshIn = Math.min(1, t / 2.2);                       // cell edges sweep in
     meshIn = 1 - Math.pow(1 - meshIn, 2);
-    var grow = Math.min(1, Math.max(0, (t - 1.7) / 3.2));    // then the streamlines
+    var tintIn = Math.min(1, Math.max(0, (t - 2.0) / 2.0));  // then the colour drains down
+    tintIn = tintIn * tintIn * (3 - 2 * tintIn);
+    var grow = Math.min(1, Math.max(0, (t - 3.4) / 3.2));    // then the streamlines
     var sweep = s.top + (s.bottom - 0.2 - s.top) * meshIn;
 
     var cam = camera(t, reduced), mvp = cam.mvp, rot = cam.rot;
@@ -453,6 +463,7 @@
     gl.uniform3fv(u(s.mesh, 'uHot'), colors.hot);
     gl.uniform1f(u(s.mesh, 'uShade'), colors.shade);
     gl.uniform1f(u(s.mesh, 'uSweep'), sweep);
+    gl.uniform1f(u(s.mesh, 'uTintSweep'), s.top + 0.1 + (s.bottom - 0.6 - s.top - 0.1) * tintIn);
     var aPos = gl.getAttribLocation(s.mesh, 'aPos'), aNrm = gl.getAttribLocation(s.mesh, 'aNrm');
     gl.bindBuffer(gl.ARRAY_BUFFER, s.pos); gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, s.nrm); gl.enableVertexAttribArray(aNrm); gl.vertexAttribPointer(aNrm, 3, gl.FLOAT, false, 0, 0);
