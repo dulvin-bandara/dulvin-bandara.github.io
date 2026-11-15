@@ -407,6 +407,9 @@ html:has(.hero[data-wall="collage"]) .themetoggle:hover{color:var(--field-ink);b
    Edit the .pw-a … .pw-h blocks to rearrange. */
 
 [data-wall="collage"]{
+  /* wordmark size, and the room its tagline and contact line need under it */
+  --wm:clamp(42px,7.2vw,108px);
+  --wm-extra:118px;
   position:relative;
   /* stops short of the fold so the first text row shows there is more below */
   height:calc(76vh - var(--hero-offset, 102px));
@@ -424,16 +427,26 @@ html:has(.hero[data-wall="collage"]) .themetoggle:hover{color:var(--field-ink);b
   overflow:hidden;
 }
 [data-wall="collage"] .pw-track{
+  /* a centred row between the nav and the wordmark. Cards are sized by the
+     row's height, so the row never grows into the wordmark below it. */
   position:absolute;
-  inset:0 0 19% 0;      /* lower fifth reserved for the wordmark */
-  display:block;
+  top:calc(var(--hero-offset, 102px) - 6px);
+  bottom:calc(var(--wm) + var(--wm-extra));
+  left:0;right:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
   width:auto;
   animation:none;
 }
 [data-wall="collage"] .pw-dup{display:none;}
 
 [data-wall="collage"] .pw-item{
-  position:absolute;
+  position:relative;
+  flex:0 0 auto;
+  height:80%;
+  aspect-ratio:3/4;
+  margin:0 -18px;
   border-radius:14px;
   overflow:hidden;
   box-shadow:var(--field-shadow);
@@ -446,23 +459,18 @@ html:has(.hero[data-wall="collage"]) .themetoggle:hover{color:var(--field-ink);b
   display:block;
 }
 
-/* left / right / centre cluster — left%, top%, width%, aspect, depth */
-[data-wall="collage"] .pw-a{left:12.5%;top:16%;width:22%;aspect-ratio:4/3;z-index:3;}
-[data-wall="collage"] .pw-a img{object-position:50% 45%;}
-[data-wall="collage"] .pw-b{left:35%;top:9%;width:28%;aspect-ratio:3/4;z-index:7;}
-[data-wall="collage"] .pw-b img{object-position:58% 38%;}
-[data-wall="collage"] .pw-c{left:64.5%;top:13%;width:17%;aspect-ratio:1/1;z-index:4;}
-[data-wall="collage"] .pw-c img{object-position:50% 50%;}
-[data-wall="collage"] .pw-d{left:59%;top:67%;width:17%;aspect-ratio:16/10;z-index:6;}
-[data-wall="collage"] .pw-d img{object-position:50% 50%;}
-[data-wall="collage"] .pw-e{left:17.5%;top:53%;width:20%;aspect-ratio:4/3;z-index:5;}
-[data-wall="collage"] .pw-e img{object-position:50% 42%;}
-[data-wall="collage"] .pw-f{left:64%;top:36%;width:22%;aspect-ratio:16/10;z-index:4;}
-[data-wall="collage"] .pw-f img{object-position:50% 50%;}
-[data-wall="collage"] .pw-g{left:3.5%;top:46%;width:17%;aspect-ratio:16/10;z-index:2;}
+/* left to right: team, day 1, rake, rear wing (dominant), rake detail, contour.
+   order, height, shape, vertical seat, depth */
+[data-wall="collage"] .pw-g{order:1;height:50%;aspect-ratio:16/10;align-self:flex-end;z-index:1;}
+[data-wall="collage"] .pw-a{order:2;align-self:flex-start;z-index:3;}
+[data-wall="collage"] .pw-e{order:3;align-self:flex-end;z-index:4;}
+[data-wall="collage"] .pw-b{order:4;height:100%;z-index:7;}
+[data-wall="collage"] .pw-c{order:5;align-self:flex-start;z-index:4;}
+[data-wall="collage"] .pw-f{order:6;height:50%;aspect-ratio:16/10;align-self:flex-end;z-index:2;}
 [data-wall="collage"] .pw-g img{object-position:52% 45%;}
-[data-wall="collage"] .pw-h{left:39%;top:72%;width:19%;aspect-ratio:16/9;z-index:2;}
-[data-wall="collage"] .pw-h img{object-position:50% 50%;}
+/* the two low-resolution shots stay out of the row */
+[data-wall="collage"] .pw-d,
+[data-wall="collage"] .pw-h{display:none;}
 
 /* slow independent drift, so the cluster breathes rather than sits still */
 @keyframes pw-float{
@@ -518,7 +526,7 @@ html:has(.hero[data-wall="collage"]) .themetoggle:hover{color:var(--field-ink);b
 [data-wall="collage"] .masthead h1{
   font-family:var(--serif);
   font-weight:400;
-  font-size:clamp(42px,8.4vw,126px);
+  font-size:var(--wm);
   line-height:0.96;
   letter-spacing:-0.018em;
   color:var(--field-ink);
@@ -1279,14 +1287,6 @@ pre.code code{background:none;border:0;padding:0;font-size:inherit;}
   :root{--gutter:30px;}
   .pw{--pw-h:170px;}
   [data-wall="band"] .pw{margin-bottom:54px;}
-  [data-wall="collage"] .pw-a{left:7%;top:20%;width:26%;}
-  [data-wall="collage"] .pw-b{left:35%;top:13%;width:31%;}
-  [data-wall="collage"] .pw-c{left:69%;top:19%;width:20%;}
-  [data-wall="collage"] .pw-e{left:14%;top:57%;width:23%;}
-  [data-wall="collage"] .pw-f{left:63%;top:49%;width:26%;}
-  [data-wall="collage"] .pw-d,
-  [data-wall="collage"] .pw-g,
-  [data-wall="collage"] .pw-h{display:none;}
 
   [data-wall="full"] .pw-track{
     grid-template-columns:repeat(4,1fr);
@@ -1321,16 +1321,7 @@ pre.code code{background:none;border:0;padding:0;font-size:inherit;}
     height:calc(74svh - var(--hero-offset, 84px));
     min-height:430px;
   }
-  [data-wall="collage"] .pw-track{inset:0 0 25% 0;}
   [data-wall="collage"] .pw-item{border-radius:10px;}
-  [data-wall="collage"] .pw-a{left:4%;top:21%;width:40%;}
-  [data-wall="collage"] .pw-b{left:33%;top:12%;width:46%;}
-  [data-wall="collage"] .pw-e{left:10%;top:60%;width:37%;}
-  [data-wall="collage"] .pw-f{left:51%;top:57%;width:42%;}
-  [data-wall="collage"] .pw-c,
-  [data-wall="collage"] .pw-d,
-  [data-wall="collage"] .pw-g,
-  [data-wall="collage"] .pw-h{display:none;}
   [data-wall="collage"] .masthead{padding-bottom:20px;}
   /* the centred contact line wraps here, so the pause control moves up under the nav */
   [data-wall="collage"] .heropause{bottom:auto;top:10px;right:0;}
@@ -1527,4 +1518,19 @@ figcaption .q:empty{display:none;}
   body::after,.cbar,.sheet::after{display:none;}
   figcaption .q{color:#444;}
   .tag[data-k]{color:#000;border-color:#999;}
+}
+
+/* collage row on smaller screens: fewer cards, sized by viewport width so a
+   tall narrow screen cannot blow them up, with more room under the wordmark */
+@media (max-width:980px){
+  [data-wall="collage"] .pw-g,
+  [data-wall="collage"] .pw-f{display:none;}
+  [data-wall="collage"] .pw-item{height:auto;width:25vw;max-height:100%;}
+  [data-wall="collage"] .pw-b{height:auto;width:32vw;}
+}
+@media (max-width:620px){
+  [data-wall="collage"]{--wm-extra:172px;}
+  [data-wall="collage"] .pw-c{display:none;}
+  [data-wall="collage"] .pw-item{width:34vw;margin:0 -26px;}
+  [data-wall="collage"] .pw-b{width:45vw;}
 }
