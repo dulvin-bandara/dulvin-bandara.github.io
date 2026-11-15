@@ -5,6 +5,7 @@
      Int16   vertex positions      Int8  vertex normals
      Uint16  triangle indices      Int16 streamline points
      Uint8   streamline speed      Uint8 wake weight
+     Uint8   vertex colour, RGB (optional, from the scan's texture)
    Sequence: the surface cells sweep in from the crown down, as
    if the mesher were running, then the streamlines grow from
    the inlet and keep advecting.
@@ -58,22 +59,24 @@
   /* ---------- shaders ---------- */
 
   var MESH_VS =
-    'attribute vec3 aPos; attribute vec3 aNrm;' +
+    'attribute vec3 aPos; attribute vec3 aNrm; attribute vec3 aCol;' +
     'uniform mat4 uMVP; uniform mat3 uRot;' +
-    'varying float vY; varying float vL;' +
-    'void main(){ vY = aPos.y; vec3 n = normalize(uRot * aNrm);' +
+    'varying float vY; varying float vL; varying vec3 vC;' +
+    'void main(){ vY = aPos.y; vC = aCol; vec3 n = normalize(uRot * aNrm);' +
     '  vL = clamp(dot(n, normalize(vec3(-0.45, 0.55, 0.7))), 0.0, 1.0);' +
     '  gl_Position = uMVP * vec4(aPos, 1.0); }';
 
-  // uMode 0: filled cell (hides the far side). uMode 1: cell edges.
+  // uMode 0: filled cell (hides the far side), tinted by the scan's colour.
+  // uMode 1: cell edges.
   var MESH_FS =
     'precision mediump float;' +
     'uniform vec3 uGround; uniform vec3 uInk; uniform vec3 uHot;' +
-    'uniform float uSweep; uniform float uMode; uniform float uShade;' +
-    'varying float vY; varying float vL;' +
+    'uniform float uSweep; uniform float uMode; uniform float uShade; uniform float uTint;' +
+    'varying float vY; varying float vL; varying vec3 vC;' +
     'void main(){ if (vY < uSweep) discard;' +
     '  float front = 1.0 - smoothstep(0.0, 0.16, vY - uSweep);' +
-    '  if (uMode < 0.5) { gl_FragColor = vec4(mix(uGround, uInk, uShade * (0.25 + 0.75 * vL)), 1.0); }' +
+    '  if (uMode < 0.5) { vec3 base = mix(uGround, uInk, uShade * (0.25 + 0.75 * vL));' +
+    '    gl_FragColor = vec4(mix(base, vC * (0.40 + 0.60 * vL), uTint), 1.0); }' +
     '  else { vec3 c = mix(uInk, uHot, front); gl_FragColor = vec4(c, mix(0.34 + 0.3 * vL, 1.0, front)); } }';
 
   var LINE_VS =
@@ -178,6 +181,7 @@
     var qpos = take(Int16Array, nV * 3), qnrm = take(Int8Array, nV * 3);
     var idx = take(Uint16Array, nT * 3);
     var qline = take(Int16Array, nL * P * 3), qspd = take(Uint8Array, nL * P), qwake = take(Uint8Array, nL * P);
+    var qcol = ab.byteLength >= o + nV * 3 ? take(Uint8Array, nV * 3) : null;
 
     var pos = new Float32Array(nV * 3), nrm = new Float32Array(nV * 3), i;
     for (i = 0; i < nV * 3; i++) { pos[i] = qpos[i] / 32767 * range; nrm[i] = qnrm[i] / 127; }
@@ -219,7 +223,8 @@
       }
     }
 
-    flat = { pos: pos, idx: idx, nT: nT, line: qline, spd: qspd, nL: nL, P: P, range: range };
+    flat = { pos: pos, idx: idx, nT: nT, line: qline, spd: qspd, nL: nL, P: P, range: range, col: qcol };
+    if (!qcol) hero.classList.add('flow-nocolour');
     // the graphics window's title strip reports what was actually loaded
     var stats = hero.querySelector('.vp-stats');
     if (stats) {
@@ -235,6 +240,7 @@
     scene = {
       mesh: mp, line: lpg,
       pos: buffer(gl.ARRAY_BUFFER, pos), nrm: buffer(gl.ARRAY_BUFFER, nrm),
+      col: qcol ? buffer(gl.ARRAY_BUFFER, qcol) : null,
       tri: buffer(gl.ELEMENT_ARRAY_BUFFER, idx), nTri: nT * 3,
       edge: buffer(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(edges)), nEdge: edges.length,
       lp: buffer(gl.ARRAY_BUFFER, lp), lt: buffer(gl.ARRAY_BUFFER, lt), li: buffer(gl.ARRAY_BUFFER, li), lw: buffer(gl.ARRAY_BUFFER, lw),
@@ -256,6 +262,7 @@
     colors.hot = hex(dark ? '#fca50a' : '#c33b4f');
     colors.shade = dark ? 0.16 : 0.10;
     colors.alpha = dark ? 0.95 : 0.92;
+    colors.tint = dark ? 0.92 : 0.88;      // how far the cells take the scan's colour
     var r = RAMP[dark ? 'dark' : 'light'], flat = [];   // local: the ramp as one float list
     r.forEach(function (h) { flat = flat.concat(hex(h)); });
     colors.ramp = new Float32Array(flat);
@@ -401,9 +408,16 @@
     c.strokeStyle = 'rgba(' + rgb(colors.ink) + ',' + (colors.dark ? 0.42 : 0.5) + ')';
     c.lineWidth = 0.6;
     c.lineJoin = 'round';
+    var tinted = d.col && shown('colour');
     for (j = 0; shown('mesh') && j < d.nT; j++) {
       i = order[j] * 3;
       var p0 = d.idx[i] * 3, p1 = d.idx[i + 1] * 3, p2 = d.idx[i + 2] * 3;
+      if (tinted) {
+        var q0 = d.idx[i] * 3, q1 = d.idx[i + 1] * 3, q2 = d.idx[i + 2] * 3;
+        c.fillStyle = 'rgb(' + Math.round((d.col[q0] + d.col[q1] + d.col[q2]) / 3 * 0.8) + ',' +
+          Math.round((d.col[q0 + 1] + d.col[q1 + 1] + d.col[q2 + 1]) / 3 * 0.8) + ',' +
+          Math.round((d.col[q0 + 2] + d.col[q1 + 2] + d.col[q2 + 2]) / 3 * 0.8) + ')';
+      }
       c.beginPath();
       c.moveTo(sp[p0], sp[p0 + 1]); c.lineTo(sp[p1], sp[p1 + 1]); c.lineTo(sp[p2], sp[p2 + 1]);
       c.closePath(); c.fill(); c.stroke();
@@ -442,6 +456,12 @@
     var aPos = gl.getAttribLocation(s.mesh, 'aPos'), aNrm = gl.getAttribLocation(s.mesh, 'aNrm');
     gl.bindBuffer(gl.ARRAY_BUFFER, s.pos); gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, s.nrm); gl.enableVertexAttribArray(aNrm); gl.vertexAttribPointer(aNrm, 3, gl.FLOAT, false, 0, 0);
+    var aCol = gl.getAttribLocation(s.mesh, 'aCol'), tint = s.col && shown('colour');
+    if (aCol >= 0) {
+      if (s.col) { gl.bindBuffer(gl.ARRAY_BUFFER, s.col); gl.enableVertexAttribArray(aCol); gl.vertexAttribPointer(aCol, 3, gl.UNSIGNED_BYTE, true, 0, 0); }
+      else { gl.disableVertexAttribArray(aCol); gl.vertexAttrib3f(aCol, 1, 1, 1); }
+    }
+    gl.uniform1f(u(s.mesh, 'uTint'), tint ? colors.tint : 0);
 
     var meshOn = shown('mesh');
     gl.disable(gl.BLEND);
@@ -460,6 +480,7 @@
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.edge);
     if (meshOn) gl.drawElements(gl.LINES, s.nEdge, gl.UNSIGNED_SHORT, 0);
     gl.disableVertexAttribArray(aNrm);
+    if (aCol >= 0) gl.disableVertexAttribArray(aCol);
 
     /* streamlines */
     if (grow > 0 && shown('lines')) {

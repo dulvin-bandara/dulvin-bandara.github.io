@@ -396,6 +396,7 @@
           break;
         case 'mesh': command('/display/mesh ' + (display('mesh') ? 'on' : 'off')); break;
         case 'lines': command('/display/streamlines ' + (display('lines') ? 'on' : 'off')); break;
+        case 'colour': command('/display/surface-colour ' + (display('colour') ? 'on' : 'off')); break;
         case 'remesh': command('/mesh/generate'); regenerate(); break;
         case 'console': setConsole(con.hidden, true); break;
       }
@@ -427,7 +428,7 @@
     ['theme', 'switch light and dark'],
     ['clear', 'empty the console']
   ];
-  if (hero) HELP.splice(6, 0, ['mesh / lines / remesh', 'graphics window display']);
+  if (hero) HELP.splice(6, 0, ['mesh / lines / colour / remesh', 'graphics window display']);
 
   function go(href) { log('Reading "' + href.replace(/^\//, '') + '"...'); window.location.href = href; }
   function exec(raw) {
@@ -476,6 +477,9 @@
         break;
       case 'lines': case 'streamlines':
         if (hero) log('  streamlines ' + (display('lines') ? 'on' : 'off')); else log('Error: no graphics window on this page.', 'c-err');
+        break;
+      case 'colour': case 'color': case 'surface-colour':
+        if (hero) log('  surface colour ' + (display('colour') ? 'on' : 'off')); else log('Error: no graphics window on this page.', 'c-err');
         break;
       case 'remesh': case 'generate': case 'regenerate':
         if (!regenerate()) log('Error: no graphics window on this page.', 'c-err');
